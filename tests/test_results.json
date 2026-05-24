@@ -1,0 +1,183 @@
+{
+  "core.imports": {
+    "passed": true,
+    "details": "All imports OK",
+    "metrics": {}
+  },
+  "core.seed": {
+    "passed": true,
+    "details": "Reproducible",
+    "metrics": {}
+  },
+  "core.trainer": {
+    "passed": true,
+    "details": "accelerator=<pytorch_lightning.accelerators.cuda.CUDAAccelerator object at 0x000002483083EBE0>",
+    "metrics": {}
+  },
+  "core.module": {
+    "passed": true,
+    "details": "shape=torch.Size([4, 2])",
+    "metrics": {}
+  },
+  "core.datamodule": {
+    "passed": true,
+    "details": "OK",
+    "metrics": {}
+  },
+  "core.callbacks": {
+    "passed": true,
+    "details": "OK",
+    "metrics": {}
+  },
+  "core.loggers": {
+    "passed": true,
+    "details": "CSVLogger OK (TensorBoardLogger skipped - tensorboard not installed)",
+    "metrics": {}
+  },
+  "train.cpu_train": {
+    "passed": true,
+    "details": "5ep in 0.21s",
+    "metrics": {
+      "time_s": 0.21,
+      "acc": 0.6
+    }
+  },
+  "train.gpu_train": {
+    "passed": true,
+    "details": "5ep in 0.75s",
+    "metrics": {
+      "time_s": 0.75,
+      "acc": 0.54
+    }
+  },
+  "train.predict": {
+    "passed": true,
+    "details": "50 preds",
+    "metrics": {
+      "n": 50
+    }
+  },
+  "train.ckpt": {
+    "passed": true,
+    "details": "OK",
+    "metrics": {}
+  },
+  "perf.cpu_speed": {
+    "passed": true,
+    "details": "10ep in 8.60s",
+    "metrics": {
+      "time_s": 8.6,
+      "ep_s": 1.163,
+      "samp_s": 4652.3
+    }
+  },
+  "perf.gpu_speed": {
+    "passed": true,
+    "details": "10ep in 1.29s",
+    "metrics": {
+      "time_s": 1.29,
+      "ep_s": 7.78,
+      "samp_s": 31119.5,
+      "gpu_peak_mb": 21.6
+    }
+  },
+  "perf.gpu_info": {
+    "passed": true,
+    "details": "NVIDIA GeForce RTX 3070 Ti 8.0GB",
+    "metrics": {
+      "name": "NVIDIA GeForce RTX 3070 Ti",
+      "mem_gb": 8.0
+    }
+  },
+  "special.mp_16_mixed": {
+    "passed": true,
+    "details": "16-mixed in 0.07s",
+    "metrics": {
+      "time_s": 0.07
+    }
+  },
+  "special.mp_bf16_mixed": {
+    "passed": true,
+    "details": "bf16-mixed in 0.07s",
+    "metrics": {
+      "time_s": 0.07
+    }
+  },
+  "special.fp64": {
+    "passed": true,
+    "details": "OK",
+    "metrics": {}
+  },
+  "special.grad_accum": {
+    "passed": true,
+    "details": "OK",
+    "metrics": {}
+  },
+  "special.early_stop": {
+    "passed": true,
+    "details": "Stopped ep 36/50",
+    "metrics": {
+      "ep": 36
+    }
+  },
+  "special.dev_stats": {
+    "passed": true,
+    "details": "OK",
+    "metrics": {}
+  },
+  "special.fabric": {
+    "passed": true,
+    "details": "OK",
+    "metrics": {}
+  },
+  "compat.torch": {
+    "passed": true,
+    "details": "2.13.0a0+git0607d0e",
+    "metrics": {
+      "v": "2.13.0a0+git0607d0e"
+    }
+  },
+  "compat.pl": {
+    "passed": true,
+    "details": "2.6.2",
+    "metrics": {
+      "v": "2.6.2"
+    }
+  },
+  "compat.python": {
+    "passed": true,
+    "details": "3.8.10 (tags/v3.8.10:3d8993a, May  3 2021, 11:48:03) [MSC v.1928 64 bit (AMD64)]",
+    "metrics": {
+      "v": "3.8.10 (tags/v3.8.10:3d8993a, May  3 2021, 11:48:03) [MSC v.1928 64 bit (AMD64)]"
+    }
+  },
+  "compat.cuda": {
+    "passed": true,
+    "details": "True",
+    "metrics": {}
+  },
+  "compat.cuda_ver": {
+    "passed": true,
+    "details": "11.3",
+    "metrics": {
+      "v": "11.3"
+    }
+  },
+  "compat.cudnn": {
+    "passed": true,
+    "details": "None",
+    "metrics": {
+      "v": "None"
+    }
+  },
+  "compat.compile": {
+    "passed": true,
+    "details": "True",
+    "metrics": {}
+  },
+  "compat.amp": {
+    "passed": true,
+    "details": "True",
+    "metrics": {}
+  }
+}

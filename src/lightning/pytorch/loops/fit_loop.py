@@ -11,10 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import annotations
 import logging
 import time
 from dataclasses import dataclass
-from typing import Any, Optional, Union
+from typing import Any, Optional, Union, Dict
 
 import torch
 from typing_extensions import override
@@ -28,14 +29,7 @@ from lightning.pytorch.loops.progress import _Progress
 from lightning.pytorch.loops.training_epoch_loop import _TrainingEpochLoop
 from lightning.pytorch.loops.utilities import _is_max_limit_reached, _select_data_fetcher
 from lightning.pytorch.trainer import call
-from lightning.pytorch.trainer.connectors.data_connector import (
-    _check_dataloader_iterable,
-    _DataLoaderSource,
-    _parse_num_batches,
-    _process_dataloader,
-    _request_dataloader,
-    _resolve_overfit_batches,
-)
+from lightning.pytorch.trainer.connectors.data_connector import _check_dataloader_iterable, _DataLoaderSource, _parse_num_batches, _process_dataloader, _request_dataloader, _resolve_overfit_batches
 from lightning.pytorch.trainer.connectors.logger_connector.result import _ResultCollection
 from lightning.pytorch.trainer.states import RunningStage, TrainerFn
 from lightning.pytorch.utilities.combined_loader import _SUPPORTED_MODES, CombinedLoader

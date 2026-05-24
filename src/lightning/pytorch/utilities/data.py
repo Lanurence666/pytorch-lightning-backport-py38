@@ -11,10 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import annotations
 import inspect
-from collections.abc import Generator, Iterable, Mapping, Sized
+from collections.abc import Sized
 from dataclasses import fields
-from typing import Any, Optional, Union
+from typing import Any, Optional, Union, Generator, Iterable, Mapping
 
 import torch
 from lightning_utilities.core.apply_func import is_dataclass_instance
@@ -23,12 +24,7 @@ from torch.utils.data import BatchSampler, DataLoader, IterableDataset, RandomSa
 from typing_extensions import TypeGuard
 
 import lightning.pytorch as pl
-from lightning.fabric.utilities.data import (
-    _reinstantiate_wrapped_cls,
-    _replace_value_in_saved_args,
-    has_iterable_dataset,
-    sized_len,
-)
+from lightning.fabric.utilities.data import _reinstantiate_wrapped_cls, _replace_value_in_saved_args, has_iterable_dataset, sized_len
 from lightning.fabric.utilities.warnings import PossibleUserWarning
 from lightning.pytorch.overrides.distributed import _IndexBatchSamplerWrapper
 from lightning.pytorch.trainer.states import RunningStage
@@ -38,7 +34,6 @@ from lightning.pytorch.utilities.rank_zero import WarningCache, rank_zero_warn
 BType = Union[Tensor, str, Mapping[Any, "BType"], Iterable["BType"]]
 
 warning_cache = WarningCache()
-
 
 def _extract_batch_size(batch: BType) -> Generator[Optional[int], None, None]:
     if isinstance(batch, Tensor):
@@ -57,7 +52,6 @@ def _extract_batch_size(batch: BType) -> Generator[Optional[int], None, None]:
             yield from _extract_batch_size(getattr(batch, field.name))
     else:
         yield None
-
 
 def extract_batch_size(batch: BType) -> int:
     """Unpack a batch to find a ``torch.Tensor``.
@@ -88,7 +82,6 @@ def extract_batch_size(batch: BType) -> int:
         raise MisconfigurationException(error_msg)
 
     return batch_size
-
 
 def has_len_all_ranks(
     dataloader: object,
@@ -128,13 +121,11 @@ def has_len_all_ranks(
         )
     return True
 
-
 def _update_dataloader(
     dataloader: DataLoader, sampler: Union[Sampler, Iterable], mode: Optional[RunningStage] = None
 ) -> DataLoader:
     dl_args, dl_kwargs = _get_dataloader_init_args_and_kwargs(dataloader, sampler, mode)
     return _reinstantiate_wrapped_cls(dataloader, *dl_args, **dl_kwargs)
-
 
 def _get_dataloader_init_args_and_kwargs(
     dataloader: DataLoader,
@@ -228,7 +219,6 @@ def _get_dataloader_init_args_and_kwargs(
             )
 
     return dl_args, dl_kwargs
-
 
 def _dataloader_init_kwargs_resolve_sampler(
     dataloader: DataLoader,
@@ -334,7 +324,6 @@ def _dataloader_init_kwargs_resolve_sampler(
         }
 
     return {"sampler": sampler, "shuffle": False, "batch_sampler": None}
-
 
 def _is_dataloader_shuffled(dataloader: object) -> bool:
     if hasattr(dataloader, "__pl_saved_kwargs"):

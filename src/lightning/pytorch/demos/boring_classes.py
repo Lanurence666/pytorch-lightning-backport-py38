@@ -11,8 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from collections.abc import Iterable, Iterator
-from typing import Any, Optional
+from __future__ import annotations
+
+from typing import Any, Optional, Iterable, Iterator
 
 import torch
 import torch.nn as nn
@@ -26,7 +27,6 @@ from torch.utils.data import DataLoader, Dataset, IterableDataset, Subset
 from lightning.pytorch import LightningDataModule, LightningModule
 from lightning.pytorch.core.optimizer import LightningOptimizer
 from lightning.pytorch.utilities.types import STEP_OUTPUT
-
 
 class RandomDictDataset(Dataset):
     """
@@ -45,7 +45,6 @@ class RandomDictDataset(Dataset):
     def __len__(self) -> int:
         return self.len
 
-
 class RandomDataset(Dataset):
     """
     .. warning::  This is meant for testing/debugging and is experimental.
@@ -61,7 +60,6 @@ class RandomDataset(Dataset):
     def __len__(self) -> int:
         return self.len
 
-
 class RandomIterableDataset(IterableDataset):
     """
     .. warning::  This is meant for testing/debugging and is experimental.
@@ -74,7 +72,6 @@ class RandomIterableDataset(IterableDataset):
     def __iter__(self) -> Iterator[Tensor]:
         for _ in range(self.count):
             yield torch.randn(self.size)
-
 
 class RandomIterableDatasetWithLen(IterableDataset):
     """
@@ -91,7 +88,6 @@ class RandomIterableDatasetWithLen(IterableDataset):
 
     def __len__(self) -> int:
         return self.count
-
 
 class BoringModel(LightningModule):
     """Testing PL Module.
@@ -153,7 +149,6 @@ class BoringModel(LightningModule):
     def predict_dataloader(self) -> DataLoader:
         return DataLoader(RandomDataset(32, 64))
 
-
 class BoringDataModule(LightningDataModule):
     """
     .. warning::  This is meant for testing/debugging and is experimental.
@@ -188,7 +183,6 @@ class BoringDataModule(LightningDataModule):
     def predict_dataloader(self) -> DataLoader:
         return DataLoader(self.random_predict)
 
-
 class BoringDataModuleNoLen(LightningDataModule):
     """
     .. warning::  This is meant for testing/debugging and is experimental.
@@ -221,7 +215,6 @@ class BoringDataModuleNoLen(LightningDataModule):
 
     def predict_dataloader(self) -> DataLoader:
         return DataLoader(self.random_predict)
-
 
 class IterableBoringDataModule(LightningDataModule):
     def __init__(self) -> None:
@@ -268,7 +261,6 @@ class IterableBoringDataModule(LightningDataModule):
         combined_predict = apply_to_collection(self.predict_datasets, Dataset, lambda x: DataLoader(x))
         return combined_predict
 
-
 class ManualOptimBoringModel(BoringModel):
     """
     .. warning::  This is meant for testing/debugging and is experimental.
@@ -286,7 +278,6 @@ class ManualOptimBoringModel(BoringModel):
         self.manual_backward(loss)
         opt.step()
         return loss
-
 
 class DemoModel(LightningModule):
     """
@@ -308,7 +299,6 @@ class DemoModel(LightningModule):
 
     def configure_optimizers(self) -> torch.optim.Optimizer:
         return torch.optim.Adam(self.parameters(), lr=self.learning_rate)
-
 
 class Net(nn.Module):
     """

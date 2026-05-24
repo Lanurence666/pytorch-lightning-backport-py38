@@ -1,3 +1,4 @@
+from __future__ import annotations
 # Copyright The Lightning AI team.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,8 +30,7 @@ from typing_extensions import override
 
 import lightning.pytorch as pl
 from lightning.pytorch.callbacks.callback import Callback
-from lightning.pytorch.utilities.model_summary import DeepSpeedSummary, summarize
-from lightning.pytorch.utilities.model_summary import ModelSummary as Summary
+from lightning.pytorch.utilities.model_summary import DeepSpeedSummary, summarize, ModelSummary as Summary
 from lightning.pytorch.utilities.model_summary.model_summary import _format_summary_table
 
 log = logging.getLogger(__name__)

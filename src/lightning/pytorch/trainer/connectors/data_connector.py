@@ -11,24 +11,19 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import annotations
 import os
-from collections.abc import Iterable
+
 from dataclasses import dataclass, field
 from datetime import timedelta
-from typing import Any, Optional, Union
+from typing import Any, Optional, Union, Iterable
 
 import torch.multiprocessing as mp
 from torch.utils.data import BatchSampler, DataLoader, RandomSampler, Sampler, SequentialSampler
 from torch.utils.data.distributed import DistributedSampler
 
 import lightning.pytorch as pl
-from lightning.fabric.utilities.data import (
-    _auto_add_worker_init_fn,
-    _replace_dunder_methods,
-    _set_sampler_epoch,
-    has_iterable_dataset,
-    suggested_max_num_workers,
-)
+from lightning.fabric.utilities.data import _auto_add_worker_init_fn, _replace_dunder_methods, _set_sampler_epoch, has_iterable_dataset, suggested_max_num_workers
 from lightning.fabric.utilities.distributed import DistributedSamplerWrapper, _InfiniteBarrier
 from lightning.pytorch.overrides.distributed import UnrepeatedDistributedSamplerWrapper
 from lightning.pytorch.trainer import call
@@ -42,7 +37,6 @@ from lightning.pytorch.utilities.types import EVAL_DATALOADERS, TRAIN_DATALOADER
 from lightning.pytorch.utilities.warnings import PossibleUserWarning
 
 warning_cache = WarningCache()
-
 
 class _DataConnector:
     def __init__(self, trainer: "pl.Trainer"):
@@ -226,7 +220,6 @@ class _DataConnector:
 
         return dataloader.sampler
 
-
 def _get_distributed_sampler(
     dataloader: DataLoader,
     shuffle: bool,
@@ -242,7 +235,6 @@ def _get_distributed_sampler(
     if isinstance(dataloader.sampler, (RandomSampler, SequentialSampler)):
         return DistributedSampler(dataloader.dataset, **kwargs)
     return DistributedSamplerWrapper(dataloader.sampler, **kwargs)
-
 
 def _resolve_overfit_batches(combined_loader: CombinedLoader, mode: RunningStage) -> None:
     """Resolve overfit batches by disabling shuffling.
@@ -267,7 +259,6 @@ def _resolve_overfit_batches(combined_loader: CombinedLoader, mode: RunningStage
         for dl in combined_loader.flattened
     ]
     combined_loader.flattened = updated
-
 
 @dataclass
 class _DataLoaderSource:
@@ -319,7 +310,6 @@ class _DataLoaderSource:
         """
         return isinstance(self.instance, (pl.LightningModule, pl.LightningDataModule))
 
-
 def _request_dataloader(data_source: _DataLoaderSource) -> Union[TRAIN_DATALOADERS, EVAL_DATALOADERS]:
     """Requests a dataloader by calling dataloader hooks corresponding to the given stage.
 
@@ -333,7 +323,6 @@ def _request_dataloader(data_source: _DataLoaderSource) -> Union[TRAIN_DATALOADE
         # Also, it records all attribute setting and deletion using patched `__setattr__` and `__delattr__`
         # methods so that the re-instantiated object is as close to the original as possible.
         return data_source.dataloader()
-
 
 @dataclass
 class _DataHookSelector:
@@ -381,7 +370,6 @@ class _DataHookSelector:
             )
         return self.model
 
-
 def _check_dataloader_iterable(
     dataloader: object,
     source: _DataLoaderSource,
@@ -412,7 +400,6 @@ def _check_dataloader_iterable(
             f"An invalid dataloader was returned from `{type(source.instance).__name__}.{source.name}()`."
             f" Found {dataloader}."
         )
-
 
 def _worker_check(trainer: "pl.Trainer", dataloader: object, name: str) -> None:
     if not isinstance(dataloader, DataLoader):
@@ -445,7 +432,6 @@ def _worker_check(trainer: "pl.Trainer", dataloader: object, name: str) -> None:
             category=PossibleUserWarning,
         )
 
-
 def _parse_num_batches(
     stage: RunningStage, length: Union[int, float], limit_batches: Union[int, float]
 ) -> Union[int, float]:
@@ -473,7 +459,6 @@ def _parse_num_batches(
             f" `limit_{stage.dataloader_prefix}_batches={min_percentage}`"
         )
     return num_batches
-
 
 def _process_dataloader(
     trainer: "pl.Trainer", trainer_fn: TrainerFn, stage: RunningStage, dataloader: object

@@ -1,3 +1,4 @@
+from __future__ import annotations
 # Copyright The Lightning AI team.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,7 +19,7 @@ Weight Averaging Callback
 
 import itertools
 from copy import deepcopy
-from typing import Any, Optional, Union
+from typing import Any, Optional, Union, Dict
 
 import torch
 from torch.optim.swa_utils import AveragedModel, get_ema_avg_fn

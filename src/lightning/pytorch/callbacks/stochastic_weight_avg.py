@@ -1,3 +1,4 @@
+from __future__ import annotations
 # Copyright The Lightning AI team.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,7 +18,7 @@ Stochastic Weight Averaging Callback
 """
 
 from copy import deepcopy
-from typing import Any, Callable, Literal, Optional, Union, cast
+from typing import Any, Callable, Literal, Optional, Union, cast, Dict
 
 import torch
 from torch import Tensor, nn

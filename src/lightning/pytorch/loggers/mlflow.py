@@ -1,3 +1,4 @@
+from __future__ import annotations
 # Copyright The Lightning AI team.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,10 +22,10 @@ import os
 import re
 import tempfile
 from argparse import Namespace
-from collections.abc import Mapping
+
 from pathlib import Path
 from time import time
-from typing import TYPE_CHECKING, Any, Callable, Literal, Optional, Union
+from typing import TYPE_CHECKING, Any, Callable, Literal, Optional, Union, Mapping
 
 import yaml
 from lightning_utilities.core.imports import RequirementCache
@@ -44,7 +45,6 @@ log = logging.getLogger(__name__)
 LOCAL_FILE_URI_PREFIX = "file:"
 _MLFLOW_AVAILABLE = RequirementCache("mlflow>=1.0.0", "mlflow")
 _MLFLOW_SYNCHRONOUS_AVAILABLE = RequirementCache("mlflow>=2.8.0", "mlflow")
-
 
 class MLFlowLogger(Logger):
     """Log using `MLflow <https://mlflow.org>`_.
@@ -68,7 +68,6 @@ class MLFlowLogger(Logger):
     .. code-block:: python
 
         from lightning.pytorch import LightningModule
-
 
         class LitModel(LightningModule):
             def training_step(self, batch, batch_idx):
@@ -381,7 +380,6 @@ class MLFlowLogger(Logger):
 
             # remember logged models - timestamp needed in case filename didn't change (lastkckpt or custom name)
             self._logged_model_time[p] = t
-
 
 def _get_resolve_tags() -> Callable:
     from mlflow.tracking import context

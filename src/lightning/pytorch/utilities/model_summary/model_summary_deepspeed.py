@@ -1,3 +1,4 @@
+from __future__ import annotations
 # Copyright 2020 The PyTorch Lightning team and Microsoft Corporation. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,13 +21,7 @@ from lightning_utilities.core.imports import RequirementCache
 from torch.nn import Parameter
 from typing_extensions import override
 
-from lightning.pytorch.utilities.model_summary.model_summary import (
-    NOT_APPLICABLE,
-    LayerSummary,
-    ModelSummary,
-    _tensor_has_shape,
-    get_human_readable_count,
-)
+from lightning.pytorch.utilities.model_summary.model_summary import NOT_APPLICABLE, LayerSummary, ModelSummary, _tensor_has_shape, get_human_readable_count
 
 
 def deepspeed_param_size(p: torch.nn.Parameter) -> int:

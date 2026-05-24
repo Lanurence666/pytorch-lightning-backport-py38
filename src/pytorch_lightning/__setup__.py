@@ -1,3 +1,4 @@
+from __future__ import annotations
 import glob
 import os.path
 from importlib.util import module_from_spec, spec_from_file_location
@@ -85,7 +86,7 @@ def _setup_args() -> dict[str, Any]:
         "long_description_content_type": "text/markdown",
         "zip_safe": False,
         "keywords": ["deep learning", "pytorch", "AI"],
-        "python_requires": ">=3.10",
+        "python_requires": ">=3.8",
         "setup_requires": ["wheel"],
         # TODO: aggregate pytorch and lite requirements as we include its source code directly in this package.
         # this is not a problem yet because lite's base requirements are all included in pytorch's base requirements

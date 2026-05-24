@@ -11,11 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import annotations
 from collections import OrderedDict
-from collections.abc import Mapping
+
 from dataclasses import dataclass, field
 from functools import partial
-from typing import Any, Callable, Optional
+from typing import Any, Callable, Optional, Dict, Mapping
 
 import torch
 from torch import Tensor
@@ -31,7 +32,6 @@ from lightning.pytorch.trainer import call
 from lightning.pytorch.utilities.exceptions import MisconfigurationException
 from lightning.pytorch.utilities.rank_zero import WarningCache
 from lightning.pytorch.utilities.types import STEP_OUTPUT
-
 
 @dataclass
 class ClosureResult(OutputResult):
@@ -87,7 +87,6 @@ class ClosureResult(OutputResult):
     @override
     def asdict(self) -> dict[str, Any]:
         return {"loss": self.loss, **self.extra}
-
 
 class Closure(AbstractClosure[ClosureResult]):
     """An implementation of a :class:`AbstractClosure` for automatic optimization in Lightning that combines three
@@ -146,9 +145,7 @@ class Closure(AbstractClosure[ClosureResult]):
         self._result = self.closure(*args, **kwargs)
         return self._result.loss
 
-
-_OUTPUTS_TYPE = dict[str, Any]
-
+_OUTPUTS_TYPE = Dict[str, Any]
 
 class _AutomaticOptimization(_Loop):
     """Performs automatic optimization (forward, zero grad, backward, optimizer step)"""

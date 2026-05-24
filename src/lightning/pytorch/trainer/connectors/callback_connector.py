@@ -11,26 +11,19 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import annotations
 import inspect
 import logging
 import os
-from collections.abc import Sequence
+
 from datetime import timedelta
-from typing import Optional, Union
+from typing import Optional, Union, Sequence
 
 from lightning_utilities.core.imports import RequirementCache
 
 import lightning.pytorch as pl
 from lightning.fabric.utilities.registry import _load_external_callbacks
-from lightning.pytorch.callbacks import (
-    Callback,
-    Checkpoint,
-    ModelCheckpoint,
-    ModelSummary,
-    ProgressBar,
-    RichProgressBar,
-    TQDMProgressBar,
-)
+from lightning.pytorch.callbacks import Callback, Checkpoint, ModelCheckpoint, ModelSummary, ProgressBar, RichProgressBar, TQDMProgressBar
 from lightning.pytorch.callbacks.batch_size_finder import BatchSizeFinder
 from lightning.pytorch.callbacks.lr_finder import LearningRateFinder
 from lightning.pytorch.callbacks.rich_model_summary import RichModelSummary
@@ -43,7 +36,6 @@ from lightning.pytorch.utilities.model_helpers import is_overridden
 from lightning.pytorch.utilities.rank_zero import rank_zero_info
 
 _log = logging.getLogger(__name__)
-
 
 class _CallbackConnector:
     def __init__(self, trainer: "pl.Trainer"):
@@ -263,7 +255,6 @@ class _CallbackConnector:
                 other_callbacks.append(cb)
 
         return tuner_callbacks + other_callbacks + checkpoint_callbacks
-
 
 def _validate_callbacks_list(callbacks: list[Callback]) -> None:
     stateful_callbacks = [cb for cb in callbacks if is_overridden("state_dict", instance=cb, parent=Callback)]

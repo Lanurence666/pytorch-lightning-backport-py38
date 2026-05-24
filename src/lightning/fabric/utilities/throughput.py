@@ -12,8 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # Adapted from https://github.com/mosaicml/composer/blob/f2a2dc820/composer/callbacks/speed_monitor.py
+from __future__ import annotations
 from collections import deque
-from typing import TYPE_CHECKING, Any, Callable, Optional, TypeVar, Union
+from typing import TYPE_CHECKING, Any, Callable, Optional, TypeVar, Union, List, Dict
 
 import torch
 from typing_extensions import override
@@ -24,7 +25,7 @@ if TYPE_CHECKING:
     from lightning.fabric import Fabric
     from lightning.fabric.plugins import Precision
 
-_THROUGHPUT_METRICS = dict[str, Union[int, float]]
+_THROUGHPUT_METRICS = Dict[str, Union[int, float]]
 
 
 # The API design of this class follows `torchmetrics.Metric` but it doesn't need to be an actual Metric because there's
@@ -636,17 +637,7 @@ def get_available_flops(device: torch.device, dtype: Union[torch.dtype, str]) ->
 
 def _plugin_to_compute_dtype(plugin: "Precision") -> torch.dtype:
     # TODO: integrate this into the precision plugins
-    from lightning.fabric.plugins import (
-        BitsandbytesPrecision,
-        DeepSpeedPrecision,
-        DoublePrecision,
-        FSDPPrecision,
-        HalfPrecision,
-        MixedPrecision,
-        Precision,
-        TransformerEnginePrecision,
-        XLAPrecision,
-    )
+    from lightning.fabric.plugins import BitsandbytesPrecision, DeepSpeedPrecision, DoublePrecision, FSDPPrecision, HalfPrecision, MixedPrecision, Precision, TransformerEnginePrecision, XLAPrecision
 
     if not isinstance(plugin, Precision):
         raise RuntimeError(f"Expected a precision plugin, got {plugin}")
@@ -670,7 +661,7 @@ def _plugin_to_compute_dtype(plugin: "Precision") -> torch.dtype:
 T = TypeVar("T", bound=float)
 
 
-class _MonotonicWindow(list[T]):
+class _MonotonicWindow(List[T]):
     """Custom fixed size list that only supports right-append and ensures that all values increase monotonically."""
 
     def __init__(self, maxlen: int) -> None:

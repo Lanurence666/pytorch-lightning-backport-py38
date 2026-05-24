@@ -1,3 +1,4 @@
+from __future__ import annotations
 import glob
 import os
 from importlib.util import module_from_spec, spec_from_file_location
@@ -78,7 +79,7 @@ def _setup_args() -> dict[str, Any]:
         "include_package_data": True,
         "zip_safe": False,
         "keywords": ["deep learning", "pytorch", "AI"],
-        "python_requires": ">=3.10",
+        "python_requires": ">=3.8",
         "setup_requires": ["wheel"],
         "install_requires": assistant.load_requirements(
             _PATH_REQUIREMENTS, unfreeze="none" if _FREEZE_REQUIREMENTS else "all"

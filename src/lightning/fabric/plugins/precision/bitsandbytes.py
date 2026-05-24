@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import annotations
 import functools
 import logging
 import math
@@ -31,11 +32,7 @@ from torch.nn.modules.module import _IncompatibleKeys
 from typing_extensions import Self, override
 
 from lightning.fabric.plugins.precision.precision import Precision
-from lightning.fabric.plugins.precision.utils import (
-    _ClassReplacementContextManager,
-    _convert_fp_tensor,
-    _DtypeContextManager,
-)
+from lightning.fabric.plugins.precision.utils import _ClassReplacementContextManager, _convert_fp_tensor, _DtypeContextManager
 from lightning.fabric.utilities.types import _DEVICE
 
 log = logging.getLogger(__name__)

@@ -11,12 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import annotations
 import shutil
-from collections.abc import Generator, Mapping
+
 from contextlib import contextmanager, nullcontext
 from datetime import timedelta
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Literal, Optional, Union
+from typing import TYPE_CHECKING, Any, Literal, Optional, Union, Dict, Generator, Mapping
 
 import torch
 from lightning_utilities.core.rank_zero import rank_zero_only as utils_rank_zero_only
@@ -26,19 +27,8 @@ from typing_extensions import override
 
 import lightning.pytorch as pl
 from lightning.fabric.plugins.collectives.torch_collective import default_pg_timeout
-from lightning.fabric.strategies.model_parallel import (
-    _distributed_checkpoint_save,
-    _is_sharded_checkpoint,
-    _load_checkpoint,
-    _setup_device_mesh,
-)
-from lightning.fabric.utilities.distributed import (
-    _distributed_is_initialized,
-    _get_default_process_group_backend_for_device,
-    _init_dist_connection,
-    _sync_ddp_if_available,
-)
-from lightning.fabric.utilities.distributed import group as _group
+from lightning.fabric.strategies.model_parallel import _distributed_checkpoint_save, _is_sharded_checkpoint, _load_checkpoint, _setup_device_mesh
+from lightning.fabric.utilities.distributed import _distributed_is_initialized, _get_default_process_group_backend_for_device, _init_dist_connection, _sync_ddp_if_available, group as _group
 from lightning.fabric.utilities.imports import _TORCH_GREATER_EQUAL_2_3, _TORCH_GREATER_EQUAL_2_4
 from lightning.fabric.utilities.init import _materialize_distributed_module
 from lightning.fabric.utilities.load import _METADATA_FILENAME
@@ -55,7 +45,6 @@ from lightning.pytorch.utilities.rank_zero import rank_zero_only
 
 if TYPE_CHECKING:
     from torch.distributed.device_mesh import DeviceMesh
-
 
 class ModelParallelStrategy(ParallelStrategy):
     """Enables user-defined parallelism applied to a model.
@@ -366,7 +355,6 @@ class ModelParallelStrategy(ParallelStrategy):
         # `LightningEnvironment.set_global_rank` will do this too, but we cannot rely on that implementation detail
         # additionally, for some implementations, the setter is a no-op, so it's safer to access the getter
         rank_zero_only.rank = utils_rank_zero_only.rank = self.global_rank
-
 
 def _align_compiled_param_names_with_module(state_dict: dict[str, Any], module: torch.nn.Module) -> dict[str, Any]:
     """Align optimizer state dict keys with a module that may have compiled submodules.

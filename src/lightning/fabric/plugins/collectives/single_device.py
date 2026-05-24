@@ -1,4 +1,5 @@
-from typing import Any
+from __future__ import annotations
+from typing import Any, List
 
 from torch import Tensor
 from typing_extensions import override
@@ -52,11 +53,11 @@ class SingleDeviceCollective(Collective):
         *_: Any,
         **__: Any,
     ) -> Tensor:
-        return scatter_list[0]
+        return scatter_List[0]
 
     @override
     def reduce_scatter(self, output: Tensor, input_list: list[Tensor], *_: Any, **__: Any) -> Tensor:
-        return input_list[0]
+        return input_List[0]
 
     @override
     def all_to_all(

@@ -11,9 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import annotations
 from collections import OrderedDict
-from collections.abc import Iterator
-from typing import Any, Optional, Union
+
+from typing import Any, Optional, Union, Iterator
 
 import torch
 from lightning_utilities import WarningCache
@@ -28,13 +29,7 @@ from lightning.pytorch.loops.utilities import _no_grad_context, _select_data_fet
 from lightning.pytorch.overrides.distributed import _IndexBatchSamplerWrapper
 from lightning.pytorch.strategies.launchers import _MultiProcessingLauncher
 from lightning.pytorch.trainer import call
-from lightning.pytorch.trainer.connectors.data_connector import (
-    _check_dataloader_iterable,
-    _DataLoaderSource,
-    _parse_num_batches,
-    _process_dataloader,
-    _request_dataloader,
-)
+from lightning.pytorch.trainer.connectors.data_connector import _check_dataloader_iterable, _DataLoaderSource, _parse_num_batches, _process_dataloader, _request_dataloader
 from lightning.pytorch.trainer.states import RunningStage, TrainerFn
 from lightning.pytorch.utilities.combined_loader import CombinedLoader
 from lightning.pytorch.utilities.data import has_len_all_ranks
@@ -42,7 +37,6 @@ from lightning.pytorch.utilities.exceptions import MisconfigurationException
 from lightning.pytorch.utilities.model_helpers import _ModuleMode
 from lightning.pytorch.utilities.signature_utils import is_param_in_hook_signature
 from lightning.pytorch.utilities.types import _PREDICT_OUTPUT
-
 
 class _PredictionLoop(_Loop):
     """Top-level loop where prediction starts."""

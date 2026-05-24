@@ -11,14 +11,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import annotations
 import copy
 import inspect
 import types
 from argparse import Namespace
-from collections.abc import Iterator, MutableMapping, Sequence
+
 from contextlib import contextmanager
 from contextvars import ContextVar
-from typing import Any, Optional, Union
+from typing import Any, Optional, Union, Iterator, MutableMapping, Sequence
 
 from lightning.fabric.utilities.data import AttributeDict
 from lightning.pytorch.utilities.parsing import save_hyperparameters
@@ -26,9 +27,7 @@ from lightning.pytorch.utilities.parsing import save_hyperparameters
 _PRIMITIVE_TYPES = (bool, int, float, str)
 _ALLOWED_CONFIG_TYPES = (AttributeDict, MutableMapping, Namespace)
 
-
 _given_hyperparameters: ContextVar = ContextVar("_given_hyperparameters", default=None)
-
 
 @contextmanager
 def _given_hyperparameters_context(hparams: dict, instantiator: str) -> Iterator[None]:
@@ -39,7 +38,6 @@ def _given_hyperparameters_context(hparams: dict, instantiator: str) -> Iterator
         yield
     finally:
         _given_hyperparameters.reset(token)
-
 
 class HyperparametersMixin:
     __jit_unused_properties__: list[str] = ["hparams", "hparams_initial"]

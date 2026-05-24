@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from contextlib import AbstractContextManager, nullcontext
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any, Literal, Type
 
 import torch
 from lightning_utilities.core.apply_func import apply_to_collection
@@ -59,7 +59,7 @@ class DeepSpeedPrecision(Precision):
             "16-true": torch.float16,
             "32-true": torch.float32,
         }
-        self._desired_dtype = precision_to_type[self.precision]
+        self._desired_dtype = precision_to_Type[self.precision]
 
     @override
     def convert_module(self, module: Module) -> Module:

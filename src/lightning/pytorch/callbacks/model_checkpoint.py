@@ -1,3 +1,4 @@
+from __future__ import annotations
 # Copyright The Lightning AI team.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,7 +28,7 @@ import warnings
 from copy import deepcopy
 from datetime import timedelta
 from pathlib import Path
-from typing import Any, Literal, Optional, Union
+from typing import Any, Literal, Optional, Union, Dict
 from weakref import proxy
 
 import torch

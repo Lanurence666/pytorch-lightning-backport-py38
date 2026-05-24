@@ -1,9 +1,9 @@
+from __future__ import annotations
 import logging
 import os
 import random
-from random import getstate as python_get_rng_state
-from random import setstate as python_set_rng_state
-from typing import Any, Optional
+from random import getstate as python_get_rng_state, setstate as python_set_rng_state
+from typing import Any, Optional, Dict
 
 import torch
 

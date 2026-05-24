@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import annotations
 import logging
 import os
 import subprocess
@@ -21,11 +22,7 @@ from typing_extensions import override
 
 import lightning.pytorch as pl
 from lightning.fabric.plugins import ClusterEnvironment
-from lightning.fabric.strategies.launchers.subprocess_script import (
-    _basic_subprocess_cmd,
-    _hydra_subprocess_cmd,
-    _launch_process_observer,
-)
+from lightning.fabric.strategies.launchers.subprocess_script import _basic_subprocess_cmd, _hydra_subprocess_cmd, _launch_process_observer
 from lightning.fabric.utilities.distributed import _set_num_threads_if_needed
 from lightning.pytorch.strategies.launchers.launcher import _Launcher
 from lightning.pytorch.trainer.connectors.signal_connector import _SIGNUM

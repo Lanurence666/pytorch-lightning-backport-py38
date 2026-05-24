@@ -1,3 +1,4 @@
+from __future__ import annotations
 # Copyright The Lightning AI team.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,8 +16,8 @@
 
 import inspect
 import os
-from collections.abc import Iterable, Sized
-from typing import IO, Any, Optional, Union, cast
+from collections.abc import Sized
+from typing import IO, Any, Optional, Union, cast, Iterable
 
 from lightning_utilities import apply_to_collection
 from torch.utils.data import DataLoader, Dataset, IterableDataset
@@ -29,7 +30,6 @@ from lightning.pytorch.core.mixins import HyperparametersMixin
 from lightning.pytorch.core.saving import _load_from_checkpoint
 from lightning.pytorch.utilities.model_helpers import _restricted_classmethod
 from lightning.pytorch.utilities.types import EVAL_DATALOADERS, TRAIN_DATALOADERS
-
 
 class LightningDataModule(DataHooks, HyperparametersMixin):
     """A DataModule standardizes the training, val, test splits, data preparation and transforms. The main advantage is

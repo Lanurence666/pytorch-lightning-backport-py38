@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import annotations
 import logging
 import os
 import signal
@@ -18,8 +19,8 @@ import subprocess
 import sys
 import threading
 import time
-from collections.abc import Sequence
-from typing import Any, Callable, Optional
+
+from typing import Any, Callable, Optional, Sequence
 
 from lightning_utilities.core.imports import RequirementCache
 from typing_extensions import override
@@ -31,7 +32,6 @@ from lightning.fabric.utilities.rank_zero import rank_prefixed_message
 
 _logger = logging.getLogger(__name__)
 _HYDRA_AVAILABLE = RequirementCache("hydra-core")
-
 
 class _SubprocessScriptLauncher(_Launcher):
     r"""A process launcher that invokes the current script as many times as desired in a single node.
@@ -154,14 +154,12 @@ class _SubprocessScriptLauncher(_Launcher):
                 " 2) `ClusterEnvironment.creates_processes_externally` incorrectly implemented."
             )
 
-
 def _basic_subprocess_cmd() -> Sequence[str]:
     import __main__  # local import to avoid https://github.com/Lightning-AI/pytorch-lightning/issues/15218
 
     if __main__.__spec__ is None:  # pragma: no-cover
         return [sys.executable, os.path.abspath(sys.argv[0])] + sys.argv[1:]
     return [sys.executable, "-m", __main__.__spec__.name] + sys.argv[1:]
-
 
 def _hydra_subprocess_cmd(local_rank: int) -> tuple[Sequence[str], str]:
     from hydra.core.hydra_config import HydraConfig
@@ -183,11 +181,9 @@ def _hydra_subprocess_cmd(local_rank: int) -> tuple[Sequence[str], str]:
     command += [f"hydra.run.dir={rundir}", f"hydra.job.name=train_ddp_process_{local_rank}", "hydra.output_subdir=null"]
     return command, cwd
 
-
 def _launch_process_observer(child_processes: list[subprocess.Popen]) -> None:
     """Launches a thread that runs along the main process and monitors the health of all processes."""
     _ChildProcessObserver(child_processes=child_processes, main_pid=os.getpid()).start()
-
 
 class _ChildProcessObserver(threading.Thread):
     def __init__(self, main_pid: int, child_processes: list[subprocess.Popen], sleep_period: int = 5) -> None:

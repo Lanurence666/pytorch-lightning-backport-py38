@@ -11,10 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from collections.abc import Generator
+from __future__ import annotations
+
 from dataclasses import dataclass
 from functools import partial, wraps
-from typing import Any, Callable, Optional, Union, cast
+from typing import Any, Callable, Optional, Union, cast, Dict, Generator
 
 import torch
 from lightning_utilities.core.apply_func import apply_to_collection
@@ -33,18 +34,15 @@ from lightning.pytorch.utilities.rank_zero import WarningCache, rank_zero_warn
 from lightning.pytorch.utilities.warnings import PossibleUserWarning
 
 _VALUE = Union[Metric, Tensor]  # Do not include scalars as they were converted to tensors
-_OUT_DICT = dict[str, Tensor]
-_PBAR_DICT = dict[str, float]
-
+_OUT_DICT = Dict[str, Tensor]
+_PBAR_DICT = Dict[str, float]
 
 class _METRICS(TypedDict):
     callback: _OUT_DICT
     log: _OUT_DICT
     pbar: _PBAR_DICT
 
-
 warning_cache = WarningCache()
-
 
 @dataclass
 class _Sync:
@@ -100,7 +98,6 @@ class _Sync:
     @staticmethod
     def no_op(value: Any, *_: Any, **__: Any) -> Any:
         return value
-
 
 @dataclass
 class _Metadata:
@@ -178,7 +175,6 @@ class _Metadata:
     @property
     def is_custom_reduction(self) -> bool:
         return not (self.is_mean_reduction or self.is_max_reduction or self.is_min_reduction or self.is_sum_reduction)
-
 
 class _ResultMetric(Metric):
     """Wraps the value provided to `:meth:`~lightning.pytorch.core.LightningModule.log`"""
@@ -307,7 +303,6 @@ class _ResultMetric(Metric):
         d = dict(self.__dict__)
         self.__dict__.update(apply_to_collection(d, (Tensor, Metric), move_data_to_device, *args, **kwargs))
         return self
-
 
 class _ResultCollection(dict):
     """Collection (dictionary) of :class:`~lightning.pytorch.trainer.connectors.logger_connector.result._ResultMetric`
@@ -525,7 +520,6 @@ class _ResultCollection(dict):
 
     def __repr__(self) -> str:
         return f"{{{self.training}, {super().__repr__()}}}"
-
 
 def _get_default_dtype() -> torch.dtype:
     """The default dtype for new tensors, but no lower than float32."""

@@ -1,3 +1,4 @@
+from __future__ import annotations
 # Copyright The Lightning AI team.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,21 +18,11 @@ import copy
 import logging
 import numbers
 import weakref
-from collections.abc import Generator, Mapping, Sequence
+
 from contextlib import contextmanager, nullcontext
 from io import BytesIO
 from pathlib import Path
-from typing import (
-    IO,
-    TYPE_CHECKING,
-    Any,
-    Callable,
-    Literal,
-    Optional,
-    Union,
-    cast,
-    overload,
-)
+from typing import IO, TYPE_CHECKING, Any, Callable, Literal, Optional, Union, cast, overload, List, Generator, Mapping, Sequence
 
 import torch
 from lightning_utilities.core.apply_func import apply_to_collection
@@ -66,13 +57,7 @@ from lightning.pytorch.utilities.imports import _TORCH_GREATER_EQUAL_2_6, _TORCH
 from lightning.pytorch.utilities.model_helpers import _restricted_classmethod
 from lightning.pytorch.utilities.rank_zero import WarningCache, rank_zero_deprecation, rank_zero_warn
 from lightning.pytorch.utilities.signature_utils import is_param_in_hook_signature
-from lightning.pytorch.utilities.types import (
-    _METRIC,
-    STEP_OUTPUT,
-    LRSchedulerPLType,
-    LRSchedulerTypeUnion,
-    OptimizerLRScheduler,
-)
+from lightning.pytorch.utilities.types import _METRIC, STEP_OUTPUT, LRSchedulerPLType, LRSchedulerTypeUnion, OptimizerLRScheduler
 
 _ONNX_AVAILABLE = RequirementCache("onnx")
 _ONNXSCRIPT_AVAILABLE = RequirementCache("onnxscript")
@@ -91,9 +76,8 @@ warning_cache = WarningCache()
 log = logging.getLogger(__name__)
 
 MODULE_OPTIMIZERS = Union[
-    Optimizer, LightningOptimizer, _FabricOptimizer, list[Optimizer], list[LightningOptimizer], list[_FabricOptimizer]
+    Optimizer, LightningOptimizer, _FabricOptimizer, List[Optimizer], List[LightningOptimizer], List[_FabricOptimizer]
 ]
-
 
 class LightningModule(
     _DeviceDtypeModuleMixin,
@@ -744,7 +728,6 @@ class LightningModule(
                 super().__init__()
                 self.automatic_optimization = False
 
-
             # Multiple optimizers (e.g.: GANs)
             def training_step(self, batch, batch_idx):
                 opt1, opt2 = self.optimizers()
@@ -782,7 +765,6 @@ class LightningModule(
 
             # if you have one val dataloader:
             def validation_step(self, batch, batch_idx): ...
-
 
             # if you have multiple val dataloaders:
             def validation_step(self, batch, batch_idx, dataloader_idx=0): ...
@@ -864,7 +846,6 @@ class LightningModule(
 
             # if you have one test dataloader:
             def test_step(self, batch, batch_idx): ...
-
 
             # if you have multiple test dataloaders:
             def test_step(self, batch, batch_idx, dataloader_idx=0): ...
@@ -1051,7 +1032,6 @@ class LightningModule(
                         # multiple of "trainer.check_val_every_n_epoch".
                     },
                 }
-
 
             # In the case of two optimizers, only one using the ReduceLROnPlateau scheduler
             def configure_optimizers(self):
@@ -1810,7 +1790,6 @@ class LightningModule(
         state["_trainer"] = None
         return state
 
-
 @contextmanager
 def _jit_is_scripting() -> Generator:
     """Workaround for https://github.com/pytorch/pytorch/issues/67146."""
@@ -1819,7 +1798,6 @@ def _jit_is_scripting() -> Generator:
         yield
     finally:
         LightningModule._jit_is_scripting = False
-
 
 class _TrainerFabricShim:
     """Intercepts attribute access on LightningModule's trainer reference and redirects it to the Fabric object."""

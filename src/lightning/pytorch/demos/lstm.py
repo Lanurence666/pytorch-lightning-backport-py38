@@ -1,3 +1,4 @@
+from __future__ import annotations
 """Demo of a simple LSTM language model.
 
 Code is adapted from the PyTorch examples at
@@ -5,8 +6,8 @@ https://github.com/pytorch/examples/blob/main/word_language_model
 
 """
 
-from collections.abc import Iterator, Sized
-from typing import Optional
+from collections.abc import Sized
+from typing import Optional, List, Iterator
 
 import torch
 import torch.nn as nn
@@ -17,7 +18,6 @@ from torch.utils.data import DataLoader, Sampler
 
 from lightning.pytorch.core import LightningModule
 from lightning.pytorch.demos.transformer import WikiText2
-
 
 class SimpleLSTM(nn.Module):
     def __init__(
@@ -52,8 +52,7 @@ class SimpleLSTM(nn.Module):
             weight.new_zeros(self.nlayers, batch_size, self.nhid),
         )
 
-
-class SequenceSampler(Sampler[list[int]]):
+class SequenceSampler(Sampler[List[int]]):
     def __init__(self, dataset: Sized, batch_size: int) -> None:
         super().__init__()
         self.dataset = dataset
@@ -67,7 +66,6 @@ class SequenceSampler(Sampler[list[int]]):
 
     def __len__(self) -> int:
         return self.chunk_size
-
 
 class LightningLSTM(LightningModule):
     def __init__(self, vocab_size: int = 33278):

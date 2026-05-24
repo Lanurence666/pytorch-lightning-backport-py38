@@ -1,3 +1,4 @@
+from __future__ import annotations
 # Copyright The Lightning AI team.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,14 +32,14 @@ For the Lightning developer: How to add a new migration?
 """
 
 import re
-from typing import Any, Callable
+from typing import Any, Callable, Dict
 
 from lightning.fabric.utilities.warnings import PossibleUserWarning
 from lightning.pytorch.callbacks.early_stopping import EarlyStopping
 from lightning.pytorch.callbacks.model_checkpoint import ModelCheckpoint
 from lightning.pytorch.utilities.rank_zero import rank_zero_warn
 
-_CHECKPOINT = dict[str, Any]
+_CHECKPOINT = Dict[str, Any]
 
 
 def _migration_index() -> dict[str, list[Callable[[_CHECKPOINT], _CHECKPOINT]]]:

@@ -11,14 +11,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import annotations
 import inspect
 import os
 import sys
-from collections.abc import Iterable
+
 from functools import partial, update_wrapper
 from pathlib import Path
 from types import MethodType
-from typing import Any, Callable, Optional, TypeVar, Union
+from typing import Any, Callable, Optional, TypeVar, Union, Type, List, Dict, Iterable
 
 import torch
 import yaml
@@ -40,13 +41,7 @@ _JSONARGPARSE_SIGNATURES_AVAILABLE = RequirementCache("jsonargparse[signatures]>
 
 if _JSONARGPARSE_SIGNATURES_AVAILABLE:
     import docstring_parser
-    from jsonargparse import (
-        ActionConfigFile,
-        ArgumentParser,
-        Namespace,
-        class_from_function,
-        register_unresolvable_import_paths,
-    )
+    from jsonargparse import ActionConfigFile, ArgumentParser, Namespace, class_from_function, register_unresolvable_import_paths
 
     register_unresolvable_import_paths(torch)  # Required until fix https://github.com/pytorch/pytorch/issues/74483
 
@@ -64,7 +59,6 @@ else:
 
 ModuleType = TypeVar("ModuleType")
 
-
 class ReduceLROnPlateau(torch.optim.lr_scheduler.ReduceLROnPlateau):
     """Custom ReduceLROnPlateau scheduler that extends PyTorch's ReduceLROnPlateau.
 
@@ -77,18 +71,15 @@ class ReduceLROnPlateau(torch.optim.lr_scheduler.ReduceLROnPlateau):
         super().__init__(optimizer, *args, **kwargs)
         self.monitor = monitor
 
-
 # LightningCLI requires the ReduceLROnPlateau defined here, thus it shouldn't accept the one from pytorch:
 LRSchedulerTypeTuple = (LRScheduler, ReduceLROnPlateau)
 LRSchedulerTypeUnion = Union[LRScheduler, ReduceLROnPlateau]
-LRSchedulerType = Union[type[LRScheduler], type[ReduceLROnPlateau]]
-
+LRSchedulerType = Union[Type[LRScheduler], Type[ReduceLROnPlateau]]
 
 # Type aliases intended for convenience of CLI developers
-ArgsType = Optional[Union[list[str], dict[str, Any], Namespace]]
+ArgsType = Optional[Union[List[str], Dict[str, Any], Namespace]]
 OptimizerCallable = Callable[[Iterable], Optimizer]
 LRSchedulerCallable = Callable[[Optimizer], Union[LRScheduler, ReduceLROnPlateau]]
-
 
 class LightningArgumentParser(ArgumentParser):
     """Extension of jsonargparse's ArgumentParser for pytorch-lightning."""
@@ -124,10 +115,10 @@ class LightningArgumentParser(ArgumentParser):
         self,
         lightning_class: Union[
             Callable[..., Union[Trainer, LightningModule, LightningDataModule, Callback]],
-            type[Trainer],
-            type[LightningModule],
-            type[LightningDataModule],
-            type[Callback],
+            Type[Trainer],
+            Type[LightningModule],
+            Type[LightningDataModule],
+            Type[Callback],
         ],
         nested_key: str,
         subclass_mode: bool = False,
@@ -217,7 +208,6 @@ class LightningArgumentParser(ArgumentParser):
         else:
             self.add_class_arguments(lr_scheduler_class, nested_key, sub_configs=True, **kwargs)
         self._lr_schedulers[nested_key] = (lr_scheduler_class, link_to)
-
 
 class SaveConfigCallback(Callback):
     """Saves a LightningCLI config to the log_dir when training starts.
@@ -314,7 +304,6 @@ class SaveConfigCallback(Callback):
             instead.
 
         """
-
 
 class LightningCLI:
     """Implementation of a configurable command line tool for pytorch-lightning."""
@@ -787,10 +776,8 @@ class LightningCLI:
         else:
             self.config["seed_everything"] = config_seed
 
-
 def _class_path_from_class(class_type: type) -> str:
     return class_type.__module__ + "." + class_type.__name__
-
 
 def _global_add_class_path(
     class_type: type, init_args: Optional[Union[Namespace, dict[str, Any]]] = None
@@ -799,13 +786,11 @@ def _global_add_class_path(
         init_args = init_args.as_dict()
     return {"class_path": _class_path_from_class(class_type), "init_args": init_args or {}}
 
-
 def _add_class_path_generator(class_type: type) -> Callable[[Namespace], dict[str, Any]]:
     def add_class_path(init_args: Namespace) -> dict[str, Any]:
         return _global_add_class_path(class_type, init_args)
 
     return add_class_path
-
 
 def instantiate_class(args: Union[Any, tuple[Any, ...]], init: dict[str, Any]) -> Any:
     """Instantiates a class with the given args and init.
@@ -826,7 +811,6 @@ def instantiate_class(args: Union[Any, tuple[Any, ...]], init: dict[str, Any]) -
     args_class = getattr(module, class_name)
     return args_class(*args, **kwargs)
 
-
 def _get_short_description(component: object) -> Optional[str]:
     if component.__doc__ is None:
         return None
@@ -836,12 +820,10 @@ def _get_short_description(component: object) -> Optional[str]:
     except (ValueError, docstring_parser.ParseError) as ex:
         rank_zero_warn(f"Failed parsing docstring for {component}: {ex}")
 
-
 def _get_module_type(value: Union[Callable, type]) -> type:
     if callable(value) and not isinstance(value, type):
         return inspect.signature(value).return_annotation
     return value
-
 
 def _set_dict_nested(data: dict, key: str, value: Any) -> None:
     keys = key.split(".")
@@ -849,7 +831,6 @@ def _set_dict_nested(data: dict, key: str, value: Any) -> None:
         assert k in data, f"Expected key {key} to be in data"
         data = data[k]
     data[keys[-1]] = value
-
 
 class _InstantiatorFn:
     def __init__(self, cli: LightningCLI, key: str) -> None:
@@ -888,7 +869,6 @@ class _InstantiatorFn:
             instantiator="lightning.pytorch.cli.instantiate_module",
         ):
             return class_type(*args, **kwargs)
-
 
 def instantiate_module(class_type: type[ModuleType], config: dict[str, Any]) -> ModuleType:
     parser = ArgumentParser(exit_on_error=False)

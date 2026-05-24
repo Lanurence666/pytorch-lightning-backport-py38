@@ -11,25 +11,18 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import annotations
 import inspect
-from collections.abc import Generator, Iterator, Mapping
+
 from copy import deepcopy
 from functools import partial, wraps
 from types import MethodType
-from typing import (
-    Any,
-    Callable,
-    Optional,
-    TypeVar,
-    Union,
-    overload,
-)
+from typing import Any, Callable, Optional, TypeVar, Union, overload, Dict, Generator, Iterator, Mapping
 
 import torch
 from lightning_utilities import is_overridden
 from lightning_utilities.core.apply_func import apply_to_collection
-from torch import Tensor
-from torch import nn as nn
+from torch import Tensor, nn as nn
 from torch._dynamo import OptimizedModule
 from torch.nn.modules.module import _IncompatibleKeys
 from torch.optim import Optimizer
@@ -43,11 +36,10 @@ from lightning.fabric.utilities.data import _set_sampler_epoch
 from lightning.fabric.utilities.device_dtype_mixin import _DeviceDtypeModuleMixin
 from lightning.fabric.utilities.types import Optimizable
 
-T_destination = TypeVar("T_destination", bound=dict[str, Any])
+T_destination = TypeVar("T_destination", bound=Dict[str, Any])
 _LIGHTNING_MODULE_STEP_METHODS = ("training_step", "validation_step", "test_step", "predict_step")
 
 _in_fabric_backward: bool = False
-
 
 class _FabricOptimizer:
     def __init__(self, optimizer: Optimizer, strategy: Strategy, callbacks: Optional[list[Callable]] = None) -> None:
@@ -96,7 +88,6 @@ class _FabricOptimizer:
 
     def __getattr__(self, item: Any) -> Any:
         return getattr(self._optimizer, item)
-
 
 class _FabricModule(_DeviceDtypeModuleMixin):
     def __init__(
@@ -289,7 +280,6 @@ class _FabricModule(_DeviceDtypeModuleMixin):
         if fabric_has_attr:
             super().__setattr__(name, value)
 
-
 class _FabricDataLoader:
     def __init__(self, dataloader: DataLoader, device: Optional[torch.device] = None) -> None:
         """The FabricDataLoader is a wrapper for the :class:`~torch.utils.data.DataLoader`. It moves the data to the
@@ -326,7 +316,6 @@ class _FabricDataLoader:
             for item in self._dataloader:
                 yield move_data_to_device(item, self._device)
 
-
 def _unwrap_objects(collection: Any) -> Any:
     def _unwrap(
         obj: Union[_FabricModule, _FabricOptimizer, _FabricDataLoader],
@@ -344,7 +333,6 @@ def _unwrap_objects(collection: Any) -> Any:
 
     return apply_to_collection(collection, dtype=tuple(types), function=_unwrap)
 
-
 def _unwrap_compiled(obj: Union[Any, OptimizedModule]) -> tuple[Union[Any, nn.Module], Optional[dict[str, Any]]]:
     """Removes the :class:`torch._dynamo.OptimizedModule` around the object if it is wrapped.
 
@@ -360,10 +348,8 @@ def _unwrap_compiled(obj: Union[Any, OptimizedModule]) -> tuple[Union[Any, nn.Mo
         return obj._orig_mod, compile_kwargs
     return obj, None
 
-
 def _to_compiled(module: nn.Module, compile_kwargs: dict[str, Any]) -> OptimizedModule:
     return torch.compile(module, **compile_kwargs)  # type: ignore[return-value]
-
 
 def _backward_hook(requires_backward: bool, *_: Any) -> None:
     if requires_backward and not _in_fabric_backward:
@@ -371,7 +357,6 @@ def _backward_hook(requires_backward: bool, *_: Any) -> None:
             "The current strategy and precision selection requires you to call `fabric.backward(loss)`"
             " instead of `loss.backward()`."
         )
-
 
 def is_wrapped(obj: object) -> bool:
     """Checks if an object was set up by Fabric.
@@ -386,7 +371,6 @@ def is_wrapped(obj: object) -> bool:
     """
     obj, _ = _unwrap_compiled(obj)
     return isinstance(obj, (_FabricModule, _FabricOptimizer, _FabricDataLoader))
-
 
 def _capture_compile_kwargs(compile_fn: Callable) -> Callable:
     """Wraps the ``torch.compile`` function and captures the compile arguments.
@@ -411,6 +395,5 @@ def _capture_compile_kwargs(compile_fn: Callable) -> Callable:
         return compiled_model
 
     return _capture
-
 
 torch.compile = _capture_compile_kwargs(torch.compile)

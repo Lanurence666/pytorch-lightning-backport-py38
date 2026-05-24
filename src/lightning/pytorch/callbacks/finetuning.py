@@ -1,3 +1,4 @@
+from __future__ import annotations
 # Copyright The Lightning AI team.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,8 +20,8 @@ Freeze and unfreeze models for finetuning purposes.
 """
 
 import logging
-from collections.abc import Generator, Iterable
-from typing import Any, Callable, Optional, Union
+
+from typing import Any, Callable, Optional, Union, Dict, Generator, Iterable
 
 import torch
 from torch.nn import Module, ModuleDict
@@ -37,13 +38,10 @@ from lightning.pytorch.utilities.rank_zero import rank_zero_warn
 if not _TORCHVISION_AVAILABLE:
     __doctest_skip__ = ["BackboneFinetuning"]
 
-
 log = logging.getLogger(__name__)
-
 
 def multiplicative(epoch: int) -> float:
     return 2.0
-
 
 class BaseFinetuning(Callback):
     r"""This class implements the base logic for writing your own Finetuning Callback.
@@ -336,7 +334,6 @@ class BaseFinetuning(Callback):
     def freeze_before_training(self, pl_module: "pl.LightningModule") -> None:
         """Override to add your freeze logic."""
         raise NotImplementedError
-
 
 class BackboneFinetuning(BaseFinetuning):
     r"""Finetune a backbone model based on a learning rate user-defined scheduling.

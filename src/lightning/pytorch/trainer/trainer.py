@@ -1,3 +1,4 @@
+from __future__ import annotations
 # Copyright The Lightning AI team.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,10 +24,10 @@
 import logging
 import math
 import os
-from collections.abc import Generator, Iterable
+
 from contextlib import contextmanager
 from datetime import timedelta
-from typing import Any, Optional, Union
+from typing import Any, Optional, Union, Generator, Iterable
 from weakref import proxy
 
 import torch
@@ -53,12 +54,7 @@ from lightning.pytorch.profilers import Profiler
 from lightning.pytorch.strategies import ParallelStrategy, Strategy
 from lightning.pytorch.trainer import call, setup
 from lightning.pytorch.trainer.configuration_validator import _verify_loop_configurations
-from lightning.pytorch.trainer.connectors.accelerator_connector import (
-    _LITERAL_WARN,
-    _PRECISION_INPUT,
-    _PRECISION_INPUT_STR,
-    _AcceleratorConnector,
-)
+from lightning.pytorch.trainer.connectors.accelerator_connector import _LITERAL_WARN, _PRECISION_INPUT, _PRECISION_INPUT_STR, _AcceleratorConnector
 from lightning.pytorch.trainer.connectors.callback_connector import _CallbackConnector
 from lightning.pytorch.trainer.connectors.checkpoint_connector import _CheckpointConnector
 from lightning.pytorch.trainer.connectors.data_connector import _DataConnector
@@ -74,17 +70,10 @@ from lightning.pytorch.utilities.model_helpers import is_overridden
 from lightning.pytorch.utilities.model_registry import _is_registry, download_model_from_registry
 from lightning.pytorch.utilities.rank_zero import rank_zero_info, rank_zero_warn
 from lightning.pytorch.utilities.seed import isolate_rng
-from lightning.pytorch.utilities.types import (
-    _EVALUATE_OUTPUT,
-    _PREDICT_OUTPUT,
-    EVAL_DATALOADERS,
-    TRAIN_DATALOADERS,
-    LRSchedulerConfig,
-)
+from lightning.pytorch.utilities.types import _EVALUATE_OUTPUT, _PREDICT_OUTPUT, EVAL_DATALOADERS, TRAIN_DATALOADERS, LRSchedulerConfig
 from lightning.pytorch.utilities.warnings import PossibleUserWarning
 
 log = logging.getLogger(__name__)
-
 
 class Trainer:
     @_defaults_from_env_vars
@@ -311,7 +300,6 @@ class Trainer:
 
             suggest_integrations: Whether to display suggestions for optional Lightning integrations.
                 Default: ``True``.
-
 
         Raises:
             TypeError:
@@ -1711,7 +1699,6 @@ class Trainer:
 
             def training_step(self, batch, batch_idx):
                 self.log("a_val", 2.0)
-
 
             callback_metrics = trainer.callback_metrics
             assert callback_metrics["a_val"] == 2.0

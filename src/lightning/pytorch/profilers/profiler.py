@@ -1,3 +1,4 @@
+from __future__ import annotations
 # Copyright The Lightning AI team.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,15 +18,14 @@ import logging
 import os
 import re
 from abc import ABC, abstractmethod
-from collections.abc import Generator
+
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Any, Callable, Optional, TextIO, Union
+from typing import Any, Callable, Optional, TextIO, Union, Generator
 
 from lightning.fabric.utilities.cloud_io import get_filesystem
 
 log = logging.getLogger(__name__)
-
 
 class Profiler(ABC):
     """If you wish to write a custom profiler, you should inherit from this class."""

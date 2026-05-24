@@ -11,10 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import annotations
 import contextlib
-from collections.abc import Generator
+
 from functools import partial
-from typing import Any, Callable, Optional, Union
+from typing import Any, Callable, Optional, Union, Generator
 
 import torch
 from torch import Tensor
@@ -28,7 +29,6 @@ from lightning.fabric.utilities.types import Steppable
 from lightning.pytorch.core.hooks import CheckpointHooks
 from lightning.pytorch.trainer import call
 from lightning.pytorch.utilities import GradClipAlgorithmType
-
 
 class Precision(FabricPrecision, CheckpointHooks):
     """Base class for all plugins handling the precision-specific parts of the training.

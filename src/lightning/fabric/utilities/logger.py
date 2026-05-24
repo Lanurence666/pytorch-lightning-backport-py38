@@ -12,17 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import annotations
 import inspect
 import json
 from argparse import Namespace
-from collections.abc import Mapping, MutableMapping
+
 from dataclasses import asdict, is_dataclass
-from typing import Any, Optional, Union
+from typing import Any, Optional, Union, Mapping, MutableMapping
 
 from torch import Tensor
 
 from lightning.fabric.utilities.imports import _NUMPY_AVAILABLE
-
 
 def _convert_params(params: Optional[Union[dict[str, Any], Namespace]]) -> dict[str, Any]:
     """Ensure parameters are a dict or convert to dict if necessary.
@@ -42,7 +42,6 @@ def _convert_params(params: Optional[Union[dict[str, Any], Namespace]]) -> dict[
         params = {}
 
     return params
-
 
 def _sanitize_callable_params(params: dict[str, Any]) -> dict[str, Any]:
     """Sanitize callable params dict, e.g. ``{'a': <function_**** at 0x****>} -> {'a': 'function_****'}``.
@@ -72,7 +71,6 @@ def _sanitize_callable_params(params: dict[str, Any]) -> dict[str, Any]:
         return val
 
     return {key: _sanitize_callable(val) for key, val in params.items()}
-
 
 def _flatten_dict(params: MutableMapping[Any, Any], delimiter: str = "/", parent_key: str = "") -> dict[str, Any]:
     """Flatten hierarchical dict, e.g. ``{'a': {'b': 'c'}} -> {'a/b': 'c'}``.
@@ -113,7 +111,6 @@ def _flatten_dict(params: MutableMapping[Any, Any], delimiter: str = "/", parent
             result[new_key] = v
     return result
 
-
 def _sanitize_params(params: dict[str, Any]) -> dict[str, Any]:
     """Returns params with non-primitvies converted to strings for logging.
 
@@ -146,11 +143,9 @@ def _sanitize_params(params: dict[str, Any]) -> dict[str, Any]:
             params[k] = str(params[k])
     return params
 
-
 def _convert_json_serializable(params: dict[str, Any]) -> dict[str, Any]:
     """Convert non-serializable objects in params to string."""
     return {k: str(v) if not _is_json_serializable(v) else v for k, v in params.items()}
-
 
 def _is_json_serializable(value: Any) -> bool:
     """Test whether a variable can be encoded as json."""
@@ -162,7 +157,6 @@ def _is_json_serializable(value: Any) -> bool:
     except (TypeError, OverflowError):
         # OverflowError is raised if number is too large to encode
         return False
-
 
 def _add_prefix(
     metrics: Mapping[str, Union[Tensor, float]], prefix: str, separator: str

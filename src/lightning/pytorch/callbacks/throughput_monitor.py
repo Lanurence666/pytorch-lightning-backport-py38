@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import annotations
 import time
 from typing import TYPE_CHECKING, Any, Callable, Optional, Union
 
@@ -18,20 +19,9 @@ import torch
 from typing_extensions import override
 
 from lightning.fabric.plugins import Precision as FabricPrecision
-from lightning.fabric.utilities.throughput import Throughput, get_available_flops
-from lightning.fabric.utilities.throughput import _plugin_to_compute_dtype as fabric_plugin_to_compute_dtype
+from lightning.fabric.utilities.throughput import Throughput, get_available_flops, _plugin_to_compute_dtype as fabric_plugin_to_compute_dtype
 from lightning.pytorch.callbacks import Callback
-from lightning.pytorch.plugins import (
-    BitsandbytesPrecision,
-    DeepSpeedPrecision,
-    DoublePrecision,
-    FSDPPrecision,
-    HalfPrecision,
-    MixedPrecision,
-    Precision,
-    TransformerEnginePrecision,
-    XLAPrecision,
-)
+from lightning.pytorch.plugins import BitsandbytesPrecision, DeepSpeedPrecision, DoublePrecision, FSDPPrecision, HalfPrecision, MixedPrecision, Precision, TransformerEnginePrecision, XLAPrecision
 from lightning.pytorch.trainer.states import RunningStage, TrainerFn
 from lightning.pytorch.utilities.rank_zero import rank_zero_only, rank_zero_warn
 

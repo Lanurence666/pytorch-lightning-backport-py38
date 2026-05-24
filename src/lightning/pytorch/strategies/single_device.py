@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Union
 
 import torch
 from torch import Tensor
@@ -36,8 +36,8 @@ class SingleDeviceStrategy(Strategy):
         self,
         device: _DEVICE = "cpu",
         accelerator: pl.accelerators.accelerator.Accelerator | None = None,
-        checkpoint_io: CheckpointIO | None = None,
-        precision_plugin: Precision | None = None,
+        checkpoint_io: Union[CheckpointIO, None] = None,
+        precision_plugin: Union[Precision, None] = None,
     ):
         super().__init__(accelerator=accelerator, checkpoint_io=checkpoint_io, precision_plugin=precision_plugin)
         if not isinstance(device, torch.device):

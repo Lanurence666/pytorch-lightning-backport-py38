@@ -11,11 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import annotations
 import logging
 from abc import ABC, abstractmethod
-from collections.abc import Iterable
+
 from contextlib import AbstractContextManager, ExitStack
-from typing import TYPE_CHECKING, Any, Callable, Optional, TypeVar, Union
+from typing import TYPE_CHECKING, Any, Callable, Optional, TypeVar, Union, Dict, Iterable
 
 import torch
 from torch import Tensor
@@ -40,7 +41,6 @@ TBroadcast = TypeVar("TBroadcast")
 TReduce = TypeVar("TReduce")
 
 log = logging.getLogger(__name__)
-
 
 class Strategy(ABC):
     """Base class for all strategies that change the behaviour of the training, validation and test- loop."""
@@ -420,7 +420,6 @@ class Strategy(ABC):
             _apply_filter(key, filter, converted, converted_state)
         return converted_state
 
-
 class _BackwardSyncControl(ABC):
     """Interface for any :class:`Strategy` that wants to offer a functionality to enable or disable gradient
     synchronization during/after back-propagation.
@@ -438,7 +437,6 @@ class _BackwardSyncControl(ABC):
 
         """
 
-
 class _Sharded(ABC):
     """Mixin-interface for any :class:`Strategy` that wants to expose functionality for sharding model parameters."""
 
@@ -451,7 +449,6 @@ class _Sharded(ABC):
 
         """
 
-
 def _validate_keys_for_strict_loading(
     requested_keys: Iterable[str], checkpoint_keys: Iterable[str], strict: bool
 ) -> None:
@@ -461,7 +458,6 @@ def _validate_keys_for_strict_loading(
             f"The requested state contains a key '{invalid_keys[0]}' that does not exist in the loaded checkpoint."
             f" To disable strict loading, set `strict=False`."
         )
-
 
 def _apply_filter(
     key: str, filter: dict[str, Callable[[str, Any], bool]], source_dict: object, target_dict: dict[str, Any]

@@ -11,21 +11,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import annotations
 import inspect
 import os
-from collections.abc import Generator, Mapping, Sequence
+
 from contextlib import AbstractContextManager, contextmanager, nullcontext
 from functools import partial
 from pathlib import Path
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    Callable,
-    Optional,
-    Union,
-    cast,
-    overload,
-)
+from typing import TYPE_CHECKING, Any, Callable, Optional, Union, cast, overload, Generator, Mapping, Sequence
 
 import torch
 import torch.nn as nn
@@ -40,24 +33,12 @@ from lightning.fabric.accelerators.accelerator import Accelerator
 from lightning.fabric.connector import _PLUGIN_INPUT, _PRECISION_INPUT, _Connector, _is_using_cli
 from lightning.fabric.loggers import Logger
 from lightning.fabric.plugins import Precision  # avoid circular imports: # isort: split
-from lightning.fabric.strategies import (
-    DataParallelStrategy,
-    DeepSpeedStrategy,
-    FSDPStrategy,
-    SingleDeviceStrategy,
-    Strategy,
-    XLAStrategy,
-)
+from lightning.fabric.strategies import DataParallelStrategy, DeepSpeedStrategy, FSDPStrategy, SingleDeviceStrategy, Strategy, XLAStrategy
 from lightning.fabric.strategies.launchers import _MultiProcessingLauncher, _XLALauncher
 from lightning.fabric.strategies.strategy import TBroadcast, _Sharded
 from lightning.fabric.utilities import move_data_to_device
 from lightning.fabric.utilities.apply_func import convert_tensors_to_scalars, convert_to_tensors
-from lightning.fabric.utilities.data import (
-    _auto_add_worker_init_fn,
-    _replace_dunder_methods,
-    _update_dataloader,
-    has_iterable_dataset,
-)
+from lightning.fabric.utilities.data import _auto_add_worker_init_fn, _replace_dunder_methods, _update_dataloader, has_iterable_dataset
 from lightning.fabric.utilities.device_dtype_mixin import _update_properties
 from lightning.fabric.utilities.distributed import DistributedSamplerWrapper, _InfiniteBarrier
 from lightning.fabric.utilities.init import _has_meta_device_parameters_or_buffers
@@ -66,22 +47,13 @@ from lightning.fabric.utilities.registry import _load_external_callbacks
 from lightning.fabric.utilities.seed import seed_everything
 from lightning.fabric.utilities.types import ReduceOp
 from lightning.fabric.utilities.warnings import PossibleUserWarning
-from lightning.fabric.wrappers import (
-    _FabricDataLoader,
-    _FabricModule,
-    _FabricOptimizer,
-    _to_compiled,
-    _unwrap_compiled,
-    _unwrap_objects,
-)
+from lightning.fabric.wrappers import _FabricDataLoader, _FabricModule, _FabricOptimizer, _to_compiled, _unwrap_compiled, _unwrap_objects
 
 if TYPE_CHECKING:
     from torch.optim.lr_scheduler import _LRScheduler
 
-
 def _do_nothing(*_: Any) -> None:
     pass
-
 
 class Fabric:
     r"""Fabric accelerates your PyTorch training or inference code with minimal changes required.

@@ -1,6 +1,5 @@
 import os
-from collections.abc import Mapping
-from typing import Any, Union
+from typing import Any, Union, Mapping
 
 import torch
 

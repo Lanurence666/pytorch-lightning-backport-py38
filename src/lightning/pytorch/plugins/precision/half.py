@@ -11,9 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from collections.abc import Generator
+
 from contextlib import AbstractContextManager, contextmanager
-from typing import Any, Literal
+from typing import Any, Literal, Generator
 
 import torch
 from lightning_utilities import apply_to_collection
@@ -23,7 +23,6 @@ from typing_extensions import override
 
 from lightning.fabric.plugins.precision.utils import _convert_fp_tensor, _DtypeContextManager
 from lightning.pytorch.plugins.precision.precision import Precision
-
 
 class HalfPrecision(Precision):
     """Plugin for training with half precision.

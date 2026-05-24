@@ -11,10 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import annotations
 import os
 from collections import Counter
-from collections.abc import Iterable
-from typing import Any, Optional, Union, cast
+
+from typing import Any, Optional, Union, cast, Iterable
 
 import torch
 from typing_extensions import get_args
@@ -24,43 +25,12 @@ from lightning.fabric.accelerators.accelerator import Accelerator
 from lightning.fabric.accelerators.cuda import CUDAAccelerator
 from lightning.fabric.accelerators.mps import MPSAccelerator
 from lightning.fabric.accelerators.xla import XLAAccelerator
-from lightning.fabric.plugins import (
-    BitsandbytesPrecision,
-    CheckpointIO,
-    DeepSpeedPrecision,
-    HalfPrecision,
-    MixedPrecision,
-    Precision,
-    TransformerEnginePrecision,
-    XLAPrecision,
-)
-from lightning.fabric.plugins.environments import (
-    ClusterEnvironment,
-    LightningEnvironment,
-    LSFEnvironment,
-    MPIEnvironment,
-    SLURMEnvironment,
-    TorchElasticEnvironment,
-)
+from lightning.fabric.plugins import BitsandbytesPrecision, CheckpointIO, DeepSpeedPrecision, HalfPrecision, MixedPrecision, Precision, TransformerEnginePrecision, XLAPrecision
+from lightning.fabric.plugins.environments import ClusterEnvironment, LightningEnvironment, LSFEnvironment, MPIEnvironment, SLURMEnvironment, TorchElasticEnvironment
 from lightning.fabric.plugins.precision.double import DoublePrecision
 from lightning.fabric.plugins.precision.fsdp import FSDPPrecision
-from lightning.fabric.plugins.precision.precision import (
-    _PRECISION_INPUT,
-    _PRECISION_INPUT_INT,
-    _PRECISION_INPUT_STR,
-    _PRECISION_INPUT_STR_ALIAS,
-    _PRECISION_INPUT_STR_ALIAS_CONVERSION,
-)
-from lightning.fabric.strategies import (
-    STRATEGY_REGISTRY,
-    DeepSpeedStrategy,
-    ParallelStrategy,
-    SingleDeviceStrategy,
-    SingleDeviceXLAStrategy,
-    Strategy,
-    XLAFSDPStrategy,
-    XLAStrategy,
-)
+from lightning.fabric.plugins.precision.precision import _PRECISION_INPUT, _PRECISION_INPUT_INT, _PRECISION_INPUT_STR, _PRECISION_INPUT_STR_ALIAS, _PRECISION_INPUT_STR_ALIAS_CONVERSION
+from lightning.fabric.strategies import STRATEGY_REGISTRY, DeepSpeedStrategy, ParallelStrategy, SingleDeviceStrategy, SingleDeviceXLAStrategy, Strategy, XLAFSDPStrategy, XLAStrategy
 from lightning.fabric.strategies.ddp import _DDP_FORK_ALIASES
 from lightning.fabric.strategies.fsdp import _FSDP_ALIASES, FSDPStrategy
 from lightning.fabric.strategies.model_parallel import ModelParallelStrategy
@@ -69,7 +39,6 @@ from lightning.fabric.utilities.device_parser import _determine_root_gpu_device
 from lightning.fabric.utilities.imports import _IS_INTERACTIVE
 
 _PLUGIN_INPUT = Union[Precision, ClusterEnvironment, CheckpointIO]
-
 
 class _Connector:
     """The Connector parses several Fabric arguments and instantiates the Strategy including its owned components.
@@ -553,7 +522,6 @@ class _Connector:
             )
         return env_value
 
-
 def _convert_precision_to_unified_args(precision: Optional[_PRECISION_INPUT]) -> Optional[_PRECISION_INPUT_STR]:
     if precision is None:
         return None
@@ -574,7 +542,6 @@ def _convert_precision_to_unified_args(precision: Optional[_PRECISION_INPUT]) ->
             )
         precision = _PRECISION_INPUT_STR_ALIAS_CONVERSION[precision]
     return cast(_PRECISION_INPUT_STR, precision)
-
 
 def _is_using_cli() -> bool:
     return bool(int(os.environ.get("LT_CLI_USED", "0")))

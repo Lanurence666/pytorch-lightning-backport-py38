@@ -16,7 +16,7 @@ import math
 import time
 from collections import OrderedDict
 from dataclasses import dataclass
-from typing import Any, Optional, Union
+from typing import Any, Optional, Union, Dict
 
 import torch
 from typing_extensions import override

@@ -1,3 +1,4 @@
+from __future__ import annotations
 # Copyright The Lightning AI team.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,8 +25,7 @@ from torch import Tensor
 from typing_extensions import override
 
 import lightning.pytorch as pl
-from lightning.fabric.loggers.tensorboard import _TENSORBOARD_AVAILABLE
-from lightning.fabric.loggers.tensorboard import TensorBoardLogger as FabricTensorBoardLogger
+from lightning.fabric.loggers.tensorboard import _TENSORBOARD_AVAILABLE, TensorBoardLogger as FabricTensorBoardLogger
 from lightning.fabric.utilities.cloud_io import _is_dir
 from lightning.fabric.utilities.logger import _convert_params
 from lightning.fabric.utilities.types import _PATH

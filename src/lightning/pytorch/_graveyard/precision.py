@@ -3,17 +3,7 @@ from typing import TYPE_CHECKING, Any, Literal, Optional
 
 import lightning.pytorch as pl
 from lightning.fabric.utilities.rank_zero import rank_zero_deprecation
-from lightning.pytorch.plugins.precision import (
-    BitsandbytesPrecision,
-    DeepSpeedPrecision,
-    DoublePrecision,
-    FSDPPrecision,
-    HalfPrecision,
-    MixedPrecision,
-    Precision,
-    TransformerEnginePrecision,
-    XLAPrecision,
-)
+from lightning.pytorch.plugins.precision import BitsandbytesPrecision, DeepSpeedPrecision, DoublePrecision, FSDPPrecision, HalfPrecision, MixedPrecision, Precision, TransformerEnginePrecision, XLAPrecision
 
 if TYPE_CHECKING:
     from torch.distributed.fsdp.sharded_grad_scaler import ShardedGradScaler

@@ -1,3 +1,4 @@
+from __future__ import annotations
 # Copyright The Lightning AI team.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,7 +20,7 @@ import os
 import time
 from collections import defaultdict
 from pathlib import Path
-from typing import Optional, Union
+from typing import Optional, Union, Tuple, List
 
 from typing_extensions import override
 
@@ -27,10 +28,10 @@ from lightning.pytorch.profilers.profiler import Profiler
 
 log = logging.getLogger(__name__)
 
-_TABLE_ROW_EXTENDED = tuple[str, float, int, float, float]
-_TABLE_DATA_EXTENDED = list[_TABLE_ROW_EXTENDED]
-_TABLE_ROW = tuple[str, float, float]
-_TABLE_DATA = list[_TABLE_ROW]
+_TABLE_ROW_EXTENDED = Tuple[str, float, int, float, float]
+_TABLE_DATA_EXTENDED = List[_TABLE_ROW_EXTENDED]
+_TABLE_ROW = Tuple[str, float, float]
+_TABLE_DATA = List[_TABLE_ROW]
 
 
 class SimpleProfiler(Profiler):

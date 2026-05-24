@@ -1,14 +1,15 @@
+from __future__ import annotations
 import atexit
 import contextlib
 import logging
 import os
 import signal
 import time
-from collections.abc import Iterable, Iterator, Sized
+from collections.abc import Sized
 from contextlib import nullcontext
 from datetime import timedelta
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Optional, Union
+from typing import TYPE_CHECKING, Any, Optional, Union, Set, List, Iterable, Iterator
 
 import torch
 import torch.nn.functional as F
@@ -29,16 +30,13 @@ else:
     class group:  # type: ignore
         WORLD = None
 
-
 if TYPE_CHECKING:
     from torch.distributed._tensor import DTensor
 
     from lightning.fabric.plugins import ClusterEnvironment
     from lightning.fabric.strategies import Strategy
 
-
 log = logging.getLogger(__name__)
-
 
 def is_shared_filesystem(strategy: "Strategy", path: Optional[_PATH] = None, timeout: int = 3) -> bool:
     """Checks whether the filesystem under the given path is shared across all processes.
@@ -98,7 +96,6 @@ def is_shared_filesystem(strategy: "Strategy", path: Optional[_PATH] = None, tim
 
     return all_found
 
-
 def _gather_all_tensors(result: Tensor, group: Optional[Any] = None) -> list[Tensor]:
     """Function to gather all tensors from several DDP processes onto a list that is broadcasted to all processes.
 
@@ -152,12 +149,10 @@ def _gather_all_tensors(result: Tensor, group: Optional[Any] = None) -> list[Ten
         gathered_result[idx] = gathered_result[idx][slice_param]
     return gathered_result
 
-
 def _simple_gather_all_tensors(result: Tensor, group: Any, world_size: int) -> list[Tensor]:
     gathered_result = [torch.zeros_like(result) for _ in range(world_size)]
     torch.distributed.all_gather(gathered_result, result, group)
     return gathered_result
-
 
 def _sync_ddp_if_available(
     result: Tensor, group: Optional[Any] = None, reduce_op: Optional[Union[ReduceOp, str]] = None
@@ -177,7 +172,6 @@ def _sync_ddp_if_available(
     if _distributed_is_initialized():
         return _sync_ddp(result, group=group, reduce_op=reduce_op)
     return result
-
 
 def _sync_ddp(result: Tensor, group: Optional[Any] = None, reduce_op: Optional[Union[ReduceOp, str]] = None) -> Tensor:
     """Reduces a tensor across several distributed processes.
@@ -222,7 +216,6 @@ def _sync_ddp(result: Tensor, group: Optional[Any] = None, reduce_op: Optional[U
         return result.copy_(result / world_size)
     return result.div_(world_size)
 
-
 def _all_gather_ddp_if_available(
     tensor: Tensor, group: Optional["torch.distributed.ProcessGroup"] = None, sync_grads: bool = False
 ) -> Tensor:
@@ -246,7 +239,6 @@ def _all_gather_ddp_if_available(
     with nullcontext() if sync_grads else torch.no_grad():
         gathered_tensors = all_gather(tensor, group)
     return torch.stack(gathered_tensors)
-
 
 def _init_dist_connection(
     cluster_environment: "ClusterEnvironment",
@@ -294,7 +286,6 @@ def _init_dist_connection(
         f"{'-' * 100}\n"
     )
 
-
 def _destroy_dist_connection() -> None:
     # Don't allow Ctrl+C to interrupt this handler
     signal.signal(signal.SIGINT, signal.SIG_IGN)
@@ -302,14 +293,12 @@ def _destroy_dist_connection() -> None:
         torch.distributed.destroy_process_group()
     signal.signal(signal.SIGINT, signal.SIG_DFL)
 
-
 def _get_default_process_group_backend_for_device(device: torch.device) -> str:
     """Return corresponding distributed backend for a given device."""
     device_backend_map = torch.distributed.Backend.default_device_backend_map
     if device.type in device_backend_map:
         return device_backend_map[device.type]
     return "gloo"
-
 
 class _DatasetSamplerWrapper(Dataset):
     """Dataset to create indexes from `Sampler` or `Iterable`"""
@@ -341,7 +330,7 @@ class _DatasetSamplerWrapper(Dataset):
     def __getitem__(self, index: int) -> Any:
         if self._sampler_list is None:
             self._sampler_list = list(self._sampler)
-        return self._sampler_list[index]
+        return self._sampler_List[index]
 
     def __len__(self) -> int:
         return len(self._sampler)
@@ -349,7 +338,6 @@ class _DatasetSamplerWrapper(Dataset):
     def reset(self) -> None:
         """Reset the sampler list in order to get new sampling."""
         self._sampler_list = list(self._sampler)
-
 
 class DistributedSamplerWrapper(DistributedSampler):
     """Wrapper over ``Sampler`` for distributed training.
@@ -370,7 +358,7 @@ class DistributedSamplerWrapper(DistributedSampler):
     @override
     def __iter__(self) -> Iterator:
         self.dataset.reset()
-        return (self.dataset[index] for index in super().__iter__())
+        return (self.dataSet[index] for index in super().__iter__())
 
     @override
     def set_epoch(self, epoch: int) -> None:
@@ -380,12 +368,10 @@ class DistributedSamplerWrapper(DistributedSampler):
         if hasattr(original_sampler, "set_epoch") and callable(original_sampler.set_epoch):
             original_sampler.set_epoch(epoch)
 
-
 def _suggested_max_num_threads(num_processes: int = 1) -> int:
     if num_processes < 1:
         raise ValueError(f"`num_processes` should be >= 1, got {num_processes}.")
     return max(1, _num_cpus_available() // num_processes)
-
 
 def _set_num_threads_if_needed(num_processes: int = 1) -> None:
     if "OMP_NUM_THREADS" not in os.environ:
@@ -393,13 +379,11 @@ def _set_num_threads_if_needed(num_processes: int = 1) -> None:
         torch.set_num_threads(num_threads)
         os.environ["OMP_NUM_THREADS"] = str(num_threads)
 
-
 def _distributed_is_initialized() -> bool:
     # `is_initialized` is only defined conditionally
     # https://github.com/pytorch/pytorch/blob/v2.1.0/torch/distributed/__init__.py#L25
     # this might happen to MacOS builds from source (default) or any build from source that sets `USE_DISTRIBUTED=0`
     return torch.distributed.is_available() and torch.distributed.is_initialized()
-
 
 class _InfiniteBarrier:
     """A barrier with an infinite timeout.
@@ -428,7 +412,6 @@ class _InfiniteBarrier:
         self.barrier()
         if self.group is not None:
             torch.distributed.destroy_process_group(self.group)
-
 
 def _is_dtensor(tensor: Tensor) -> TypeGuard["DTensor"]:
     if _TORCH_GREATER_EQUAL_2_4:

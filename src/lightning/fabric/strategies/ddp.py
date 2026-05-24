@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import annotations
 from contextlib import AbstractContextManager, nullcontext
 from datetime import timedelta
 from typing import Any, Literal, Optional, Union
@@ -33,14 +34,7 @@ from lightning.fabric.strategies.launchers.subprocess_script import _SubprocessS
 from lightning.fabric.strategies.parallel import ParallelStrategy
 from lightning.fabric.strategies.registry import _StrategyRegistry
 from lightning.fabric.strategies.strategy import TBroadcast, _BackwardSyncControl
-from lightning.fabric.utilities.distributed import (
-    ReduceOp,
-    _distributed_is_initialized,
-    _get_default_process_group_backend_for_device,
-    _init_dist_connection,
-    _sync_ddp_if_available,
-)
-from lightning.fabric.utilities.distributed import group as _group
+from lightning.fabric.utilities.distributed import ReduceOp, _distributed_is_initialized, _get_default_process_group_backend_for_device, _init_dist_connection, _sync_ddp_if_available, group as _group
 from lightning.fabric.utilities.imports import _TORCH_GREATER_EQUAL_2_3
 from lightning.fabric.utilities.rank_zero import rank_zero_only
 

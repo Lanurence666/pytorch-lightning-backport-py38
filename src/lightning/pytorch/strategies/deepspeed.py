@@ -11,17 +11,18 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import annotations
 import argparse
 import json
 import logging
 import os
 import platform
 from collections import OrderedDict
-from collections.abc import Generator, Mapping
+
 from contextlib import contextmanager
 from datetime import timedelta
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Optional, Union
+from typing import TYPE_CHECKING, Any, Optional, Union, Generator, Mapping
 
 import torch
 from torch.nn import Module
@@ -33,13 +34,7 @@ import lightning.pytorch as pl
 from lightning.fabric.plugins import ClusterEnvironment
 from lightning.fabric.plugins.collectives.torch_collective import default_pg_timeout
 from lightning.fabric.strategies import _StrategyRegistry
-from lightning.fabric.strategies.deepspeed import (
-    _DEEPSPEED_AVAILABLE,
-    _DEEPSPEED_GREATER_EQUAL_0_16,
-    _format_precision_config,
-    _validate_checkpoint_directory,
-    _validate_device_index_selection,
-)
+from lightning.fabric.strategies.deepspeed import _DEEPSPEED_AVAILABLE, _DEEPSPEED_GREATER_EQUAL_0_16, _format_precision_config, _validate_checkpoint_directory, _validate_device_index_selection
 from lightning.fabric.utilities.imports import _TORCH_GREATER_EQUAL_2_6
 from lightning.fabric.utilities.optimizer import _optimizers_to_device
 from lightning.fabric.utilities.seed import reset_seed
@@ -61,7 +56,6 @@ warning_cache = WarningCache()
 if TYPE_CHECKING:
     import deepspeed
 
-
 def remove_module_hooks(model: torch.nn.Module) -> None:
     # todo (tchaton) awaiting this feature to move upstream to DeepSpeed
     for module in model.modules():
@@ -71,7 +65,6 @@ def remove_module_hooks(model: torch.nn.Module) -> None:
         module._forward_pre_hooks = OrderedDict()
         module._state_dict_hooks = OrderedDict()
         module._load_state_dict_pre_hooks = OrderedDict()
-
 
 class DeepSpeedStrategy(DDPStrategy):
     strategy_name = "deepspeed"

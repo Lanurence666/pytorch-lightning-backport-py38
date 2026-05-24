@@ -11,12 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import annotations
 import math
 import time
-from collections.abc import Generator
+
 from dataclasses import dataclass
 from datetime import timedelta
-from typing import Any, Optional, Union, cast
+from typing import Any, Optional, Union, cast, Generator
 
 import torch
 from lightning_utilities.core.apply_func import apply_to_collection
@@ -234,7 +235,6 @@ if _RICH_AVAILABLE:
                         value = str(value)
                 yield f"{name}: {value}"
 
-
 @dataclass
 class RichProgressBarTheme:
     """Styles to associate to different base components.
@@ -263,7 +263,6 @@ class RichProgressBarTheme:
     metrics: Union[str, "Style"] = "italic"
     metrics_text_delimiter: str = " "
     metrics_format: str = ".3f"
-
 
 class RichProgressBar(ProgressBar):
     """Create a progress bar with `rich text formatting <https://github.com/Textualize/rich>`_.

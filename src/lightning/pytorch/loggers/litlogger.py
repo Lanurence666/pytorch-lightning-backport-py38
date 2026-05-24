@@ -1,3 +1,4 @@
+from __future__ import annotations
 # Copyright The Lightning AI team.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,9 +19,9 @@ import logging
 import os
 import warnings
 from argparse import Namespace
-from collections.abc import Mapping
+
 from datetime import datetime, timezone
-from typing import TYPE_CHECKING, Any, Optional, Union, cast
+from typing import TYPE_CHECKING, Any, Optional, Union, cast, Dict, Mapping
 
 from lightning_utilities.core.imports import RequirementCache
 from torch import Tensor
@@ -42,13 +43,11 @@ log = logging.getLogger(__name__)
 
 _LITLOGGER_AVAILABLE = RequirementCache("litlogger>=0.1.0")
 
-
 def _create_experiment_name() -> str:
     """Create a random experiment name using litlogger's generator."""
     from litlogger.generator import _create_name
 
     return _create_name()
-
 
 class LitLogger(Logger):
     """Logger that enables remote experiment tracking, logging, and artifact management on lightning.ai."""
@@ -327,7 +326,7 @@ class LitLogger(Logger):
         self._require_experiment()[self._model_key()] = Model(
             model,
             version=self._model_version(version, self._step),
-            metadata=cast(Optional[dict[str, str]], metadata),
+            metadata=cast(Optional[Dict[str, str]], metadata),
             staging_dir=staging_dir,
         )
 

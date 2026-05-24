@@ -1,3 +1,4 @@
+from __future__ import annotations
 # Copyright 2020 The PyTorch Lightning team and Microsoft Corporation. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,10 +14,9 @@
 # limitations under the License.
 """Utilities that can be used with Deepspeed."""
 
-from __future__ import annotations
 
 import os
-from typing import Any
+from typing import Any, Dict
 
 import torch
 
@@ -72,11 +72,7 @@ def convert_zero_checkpoint_to_fp32_state_dict(
     if not _DEEPSPEED_AVAILABLE:
         raise ModuleNotFoundError(str(_DEEPSPEED_AVAILABLE))
 
-    from deepspeed.utils.zero_to_fp32 import (
-        get_fp32_state_dict_from_zero_checkpoint,
-        get_model_state_file,
-        get_optim_files,
-    )
+    from deepspeed.utils.zero_to_fp32 import get_fp32_state_dict_from_zero_checkpoint, get_model_state_file, get_optim_files
 
     state_dict = get_fp32_state_dict_from_zero_checkpoint(checkpoint_dir, tag)
 

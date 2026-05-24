@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import annotations
 import io
 import logging
 import os
@@ -28,11 +29,7 @@ from torch import Tensor
 from typing_extensions import override
 
 import lightning.pytorch as pl
-from lightning.fabric.strategies.launchers.multiprocessing import (
-    _check_bad_cuda_fork,
-    _check_missing_main_guard,
-    _disable_module_memory_sharing,
-)
+from lightning.fabric.strategies.launchers.multiprocessing import _check_bad_cuda_fork, _check_missing_main_guard, _disable_module_memory_sharing
 from lightning.fabric.utilities import move_data_to_device
 from lightning.fabric.utilities.distributed import _set_num_threads_if_needed
 from lightning.fabric.utilities.seed import _collect_rng_states, _set_rng_states

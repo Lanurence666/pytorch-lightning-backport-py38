@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import annotations
 import logging
 import os
 import pickle
@@ -18,7 +19,7 @@ import sys
 import threading
 import warnings
 from types import ModuleType, TracebackType
-from typing import Any, Optional
+from typing import Any, Optional, Dict
 
 from packaging.version import Version
 from typing_extensions import override
@@ -32,7 +33,7 @@ from lightning.pytorch.utilities.migration.migration import _migration_index
 from lightning.pytorch.utilities.rank_zero import rank_zero_warn
 
 _log = logging.getLogger(__name__)
-_CHECKPOINT = dict[str, Any]
+_CHECKPOINT = Dict[str, Any]
 _lock = threading.Lock()
 
 

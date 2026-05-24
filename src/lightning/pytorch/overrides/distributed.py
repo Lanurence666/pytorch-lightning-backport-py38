@@ -11,9 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import annotations
 import itertools
-from collections.abc import Iterable, Iterator, Sized
-from typing import Any, Callable, Optional, Union, cast
+from collections.abc import Sized
+from typing import Any, Callable, Optional, Union, cast, Set, Iterable, Iterator
 
 import torch
 from torch import Tensor
@@ -24,7 +25,6 @@ from typing_extensions import Self, override
 from lightning.fabric.utilities.distributed import _DatasetSamplerWrapper
 from lightning.pytorch.utilities.rank_zero import rank_zero_debug, rank_zero_info
 from lightning.pytorch.utilities.types import _SizedIterable
-
 
 def _find_tensors(
     obj: Union[Tensor, list, tuple, dict, Any],
@@ -37,7 +37,6 @@ def _find_tensors(
     if isinstance(obj, dict):
         return itertools.chain(*map(_find_tensors, obj.values()))
     return []
-
 
 # In manual_optimization, we need to call reducer prepare_for_backward.
 # Note: Keep track of PyTorch DDP and update if there is a change
@@ -57,7 +56,6 @@ def prepare_for_backward(model: DistributedDataParallel, output: Any) -> None:
         reducer.prepare_for_backward(args)
     else:
         model.require_forward_param_sync = False
-
 
 def _register_ddp_comm_hook(
     model: DistributedDataParallel,
@@ -94,11 +92,7 @@ def _register_ddp_comm_hook(
 
     Examples::
 
-        from torch.distributed.algorithms.ddp_comm_hooks import (
-            default_hooks as default,
-            powerSGD_hook as powerSGD,
-            post_localSGD_hook as post_localSGD,
-        )
+        from torch.distributed.algorithms.ddp_comm_hooks import default_hooks as default, powerSGD_hook as powerSGD, post_localSGD_hook as post_localSGD
 
         # fp16_compress_hook for compress gradients
         ddp_model = ...
@@ -160,7 +154,6 @@ def _register_ddp_comm_hook(
     rank_zero_debug(f"Registering DDP comm hook: {ddp_comm_hook.__qualname__}.")
     model.register_comm_hook(state=ddp_comm_state, hook=ddp_comm_hook)
 
-
 def _sync_module_states(module: torch.nn.Module) -> None:
     """Taken from https://github.com/pytorch/pytorch/blob/v2.0.0/torch/nn/parallel/distributed.py#L675-L682."""
     parameters_to_ignore = set(getattr(module, "_ddp_params_and_buffers_to_ignore", []))
@@ -174,7 +167,6 @@ def _sync_module_states(module: torch.nn.Module) -> None:
         src=0,
         params_and_buffers_to_ignore=parameters_to_ignore,
     )
-
 
 class UnrepeatedDistributedSampler(DistributedSampler):
     """A fork of the PyTorch DistributedSampler that doesn't repeat data, instead allowing the number of batches per
@@ -219,7 +211,6 @@ class UnrepeatedDistributedSampler(DistributedSampler):
 
         return iter(indices)
 
-
 class UnrepeatedDistributedSamplerWrapper(UnrepeatedDistributedSampler):
     """Equivalent class to ``DistributedSamplerWrapper`` but for the ``UnrepeatedDistributedSampler``."""
 
@@ -229,8 +220,7 @@ class UnrepeatedDistributedSamplerWrapper(UnrepeatedDistributedSampler):
     @override
     def __iter__(self) -> Iterator:
         self.dataset.reset()
-        return (self.dataset[index] for index in super().__iter__())
-
+        return (self.dataSet[index] for index in super().__iter__())
 
 class _IndexBatchSamplerWrapper:
     """This class is used to wrap a :class:`torch.utils.data.BatchSampler` and capture its indices."""

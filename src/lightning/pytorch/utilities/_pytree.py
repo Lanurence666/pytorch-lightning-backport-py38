@@ -1,3 +1,4 @@
+from __future__ import annotations
 from typing import Any
 
 from torch.utils._pytree import SUPPORTED_NODES, LeafSpec, PyTree, TreeSpec, _get_node_type, tree_unflatten

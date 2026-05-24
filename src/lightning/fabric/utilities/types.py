@@ -11,18 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import annotations
 from collections import defaultdict
-from collections.abc import Iterator
+
 from pathlib import Path
-from typing import (
-    Any,
-    Callable,
-    Optional,
-    Protocol,
-    TypeVar,
-    Union,
-    runtime_checkable,
-)
+from typing import Any, Callable, Optional, Protocol, TypeVar, Union, runtime_checkable, Dict, Iterator
 
 import torch
 from torch import Tensor
@@ -33,7 +26,7 @@ UntypedStorage: TypeAlias = torch.UntypedStorage
 _PATH = Union[str, Path]
 _DEVICE = Union[torch.device, str, int]
 _MAP_LOCATION_TYPE = Optional[
-    Union[_DEVICE, Callable[[UntypedStorage, str], Optional[UntypedStorage]], dict[_DEVICE, _DEVICE]]
+    Union[_DEVICE, Callable[[UntypedStorage, str], Optional[UntypedStorage]], Dict[_DEVICE, _DEVICE]]
 ]
 _PARAMETERS = Iterator[torch.nn.Parameter]
 
@@ -47,7 +40,6 @@ else:
 
 _DictKey = TypeVar("_DictKey")
 
-
 @runtime_checkable
 class _Stateful(Protocol[_DictKey]):
     """This class is used to detect if an object is stateful using `isinstance(obj, _Stateful)`."""
@@ -56,13 +48,11 @@ class _Stateful(Protocol[_DictKey]):
 
     def load_state_dict(self, state_dict: dict[_DictKey, Any]) -> None: ...
 
-
 @runtime_checkable
 class CollectibleGroup(Protocol):
     def size(self) -> int: ...
 
     def rank(self) -> int: ...
-
 
 @runtime_checkable
 class Steppable(Protocol):
@@ -75,7 +65,6 @@ class Steppable(Protocol):
     def step(self, closure: Callable[[], float]) -> float: ...
 
     def step(self, closure: Optional[Callable[[], float]] = ...) -> Optional[float]: ...
-
 
 @runtime_checkable
 class Optimizable(Steppable, Protocol):

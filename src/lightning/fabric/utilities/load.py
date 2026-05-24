@@ -10,15 +10,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import annotations
 import os
 import pickle
 import warnings
 from collections import OrderedDict
-from collections.abc import Sequence
+
 from functools import partial
 from io import BytesIO
 from pathlib import Path
-from typing import IO, TYPE_CHECKING, Any, Callable, Optional, Union
+from typing import IO, TYPE_CHECKING, Any, Callable, Optional, Union, Sequence
 
 import torch
 from lightning_utilities.core.apply_func import apply_to_collection
@@ -32,10 +33,8 @@ from lightning.fabric.utilities.types import _PATH, _Stateful
 
 _METADATA_FILENAME = "meta.pt"
 
-
 if TYPE_CHECKING:
     from torch.storage import TypedStorage
-
 
 # Modified from https://github.com/lernapparat/torchhacks by Thomas Viehmann
 class _NotYetLoadedTensor:
@@ -174,7 +173,6 @@ class _NotYetLoadedTensor:
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}({repr(self.metatensor)})"
 
-
 # Modified from https://github.com/lernapparat/torchhacks by Thomas Viehmann
 class _LazyLoadingUnpickler(pickle.Unpickler):
     def __init__(self, file: IO, file_reader: torch.PyTorchFileReader) -> None:
@@ -203,7 +201,6 @@ class _LazyLoadingUnpickler(pickle.Unpickler):
         storage.archiveinfo = pid
         return storage
 
-
 def _lazy_load(filename: _PATH) -> Any:
     if not os.path.isfile(filename):
         raise FileNotFoundError(f"Path {str(filename)!r} does not exist or is not a file.")
@@ -212,13 +209,11 @@ def _lazy_load(filename: _PATH) -> Any:
         mup = _LazyLoadingUnpickler(pkl, file_reader)
         return mup.load()
 
-
 def _materialize_tensors(collection: Any) -> Any:
     def _load_tensor(t: _NotYetLoadedTensor) -> Tensor:
         return t._load_tensor()
 
     return apply_to_collection(collection, dtype=_NotYetLoadedTensor, function=_load_tensor)
-
 
 def _move_state_into(
     source: dict[str, Any], destination: dict[str, Union[Any, _Stateful]], keys: Optional[set[str]] = None
@@ -235,7 +230,6 @@ def _move_state_into(
             destination[key].load_state_dict(state)
         else:
             destination[key] = state
-
 
 def _load_distributed_checkpoint(checkpoint_folder: Path) -> dict[str, Any]:
     """Loads a sharded checkpoint saved with the `torch.distributed.checkpoint` into a full state dict.

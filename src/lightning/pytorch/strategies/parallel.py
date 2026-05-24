@@ -11,10 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import annotations
 from abc import ABC, abstractmethod
-from collections.abc import Generator
+
 from contextlib import contextmanager
-from typing import Any, Optional
+from typing import Any, Optional, Generator
 
 import torch
 from torch import Tensor
@@ -26,7 +27,6 @@ from lightning.fabric.utilities.distributed import ReduceOp, _all_gather_ddp_if_
 from lightning.pytorch.plugins import LayerSync
 from lightning.pytorch.plugins.precision import Precision
 from lightning.pytorch.strategies.strategy import Strategy
-
 
 class ParallelStrategy(Strategy, ABC):
     """Strategy for training with multiple processes in parallel."""

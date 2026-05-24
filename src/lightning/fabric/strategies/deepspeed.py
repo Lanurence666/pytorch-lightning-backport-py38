@@ -11,17 +11,18 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import annotations
 import argparse
 import json
 import logging
 import os
 import platform
-from collections.abc import Mapping
+
 from contextlib import AbstractContextManager, ExitStack
 from datetime import timedelta
 from itertools import chain
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Callable, Optional, Union
+from typing import TYPE_CHECKING, Any, Callable, Optional, Union, Mapping
 
 import torch
 from lightning_utilities.core.imports import RequirementCache
@@ -49,7 +50,6 @@ if TYPE_CHECKING:
 
 _DEEPSPEED_AVAILABLE = RequirementCache("deepspeed")
 _DEEPSPEED_GREATER_EQUAL_0_16 = RequirementCache("deepspeed>=0.16.0")
-
 
 # TODO(fabric): Links in the docstrings to PL-specific deepspeed user docs need to be replaced.
 class DeepSpeedStrategy(DDPStrategy, _Sharded):
@@ -839,13 +839,11 @@ class DeepSpeedStrategy(DDPStrategy, _Sharded):
         assert isinstance(config, dict) or config is None
         return config
 
-
 def _get_deepspeed_engines_from_state(state: dict[str, Any]) -> list["DeepSpeedEngine"]:
     from deepspeed import DeepSpeedEngine
 
     modules = chain(*(module.modules() for module in state.values() if isinstance(module, Module)))
     return [engine for engine in modules if isinstance(engine, DeepSpeedEngine)]
-
 
 def _validate_state_keys(state: dict[str, Any]) -> None:
     # DeepSpeed merges the client state into its internal engine state when saving, but it does not check for
@@ -873,7 +871,6 @@ def _validate_state_keys(state: dict[str, Any]) -> None:
             + ", ".join(colliding_keys)
         )
 
-
 def _validate_device_index_selection(parallel_devices: list[torch.device]) -> None:
     selected_device_indices = [device.index for device in parallel_devices]
     expected_device_indices = list(range(len(parallel_devices)))
@@ -884,11 +881,9 @@ def _validate_device_index_selection(parallel_devices: list[torch.device]) -> No
             f" instead. For example: `CUDA_VISIBLE_DEVICES={','.join(str(i) for i in selected_device_indices)}`."
         )
 
-
 def _is_deepspeed_checkpoint(path: Path) -> bool:
     """Heuristic check whether the path points to a top-level DeepSpeed checkpoint directory."""
     return path.is_dir() and (path / "checkpoint").is_dir()
-
 
 def _validate_checkpoint_directory(path: _PATH) -> None:
     """Validates that the path points to a DeepSpeed checkpoint directory and suggests fixes for user error."""
@@ -923,7 +918,6 @@ def _validate_checkpoint_directory(path: _PATH) -> None:
                 f" Try to load using this parent directory instead: {path.parent.parent}"
             )
         raise FileNotFoundError(default_message)
-
 
 def _format_precision_config(
     config: dict[str, Any],

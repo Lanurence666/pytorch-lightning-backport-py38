@@ -12,20 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from collections.abc import Iterable, MutableMapping
-
 from torch import Tensor
 from torch.optim import Optimizer
 
 from lightning.fabric.utilities.apply_func import apply_to_collection, move_data_to_device
 from lightning.fabric.utilities.types import _DEVICE
-
+from typing import Iterable, MutableMapping
 
 def _optimizers_to_device(optimizers: Iterable[Optimizer], device: _DEVICE) -> None:
     """Moves optimizer states for a sequence of optimizers to the device."""
     for opt in optimizers:
         _optimizer_to_device(opt, device)
-
 
 def _optimizer_to_device(optimizer: Optimizer, device: _DEVICE) -> None:
     """Moves the state of a single optimizer to the device."""

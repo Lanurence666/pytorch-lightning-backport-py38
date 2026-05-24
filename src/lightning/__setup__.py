@@ -1,3 +1,4 @@
+from __future__ import annotations
 import glob
 import os.path
 from importlib.util import module_from_spec, spec_from_file_location
@@ -94,7 +95,7 @@ def _setup_args() -> dict[str, Any]:
         "include_package_data": True,
         "zip_safe": False,
         "keywords": ["deep learning", "pytorch", "AI"],
-        "python_requires": ">=3.10",
+        "python_requires": ">=3.8",
         "entry_points": {
             "console_scripts": [
                 "fabric = lightning.fabric.cli:_main",

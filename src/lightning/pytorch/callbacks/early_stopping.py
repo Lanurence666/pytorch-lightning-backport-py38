@@ -1,3 +1,4 @@
+from __future__ import annotations
 # Copyright The Lightning AI team.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,7 +22,7 @@ Monitor a metric and stop training when it stops improving.
 
 import logging
 from enum import Enum
-from typing import Any, Callable, Optional
+from typing import Any, Callable, Optional, Dict
 
 import torch
 from torch import Tensor

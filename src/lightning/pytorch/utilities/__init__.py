@@ -15,25 +15,13 @@
 
 import torch
 
-from lightning.fabric.utilities import (
-    LightningEnum,
-    disable_possible_user_warnings,
-    is_shared_filesystem,
-    measure_flops,
-    move_data_to_device,
-    suggested_max_num_workers,
-)
+from lightning.fabric.utilities import LightningEnum, disable_possible_user_warnings, is_shared_filesystem, measure_flops, move_data_to_device, suggested_max_num_workers
 from lightning.pytorch.utilities.combined_loader import CombinedLoader
 from lightning.pytorch.utilities.enums import GradClipAlgorithmType
 from lightning.pytorch.utilities.grads import grad_norm
 from lightning.pytorch.utilities.parameter_tying import find_shared_parameters, set_shared_parameters
 from lightning.pytorch.utilities.parsing import AttributeDict, is_picklable
-from lightning.pytorch.utilities.rank_zero import (
-    rank_zero_deprecation,
-    rank_zero_info,
-    rank_zero_only,
-    rank_zero_warn,
-)
+from lightning.pytorch.utilities.rank_zero import rank_zero_deprecation, rank_zero_info, rank_zero_only, rank_zero_warn
 
 __all__ = [
     "AttributeDict",

@@ -1,3 +1,4 @@
+from __future__ import annotations
 # Copyright The Lightning AI team.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,21 +19,16 @@ Weights and Biases Logger
 
 import os
 from argparse import Namespace
-from collections.abc import Mapping
+
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Literal, Optional, Union
+from typing import TYPE_CHECKING, Any, Literal, Optional, Union, Mapping
 
 import torch.nn as nn
 from lightning_utilities.core.imports import RequirementCache
 from torch import Tensor
 from typing_extensions import override
 
-from lightning.fabric.utilities.logger import (
-    _add_prefix,
-    _convert_json_serializable,
-    _convert_params,
-    _sanitize_callable_params,
-)
+from lightning.fabric.utilities.logger import _add_prefix, _convert_json_serializable, _convert_params, _sanitize_callable_params
 from lightning.fabric.utilities.types import _PATH
 from lightning.pytorch.callbacks.model_checkpoint import ModelCheckpoint
 from lightning.pytorch.loggers.logger import Logger, rank_zero_experiment
@@ -46,7 +42,6 @@ if TYPE_CHECKING:
     from wandb.wandb_run import Run
 
 _WANDB_AVAILABLE = RequirementCache("wandb>=0.12.10")
-
 
 class WandbLogger(Logger):
     r"""Log using `Weights and Biases <https://docs.wandb.ai/guides/integrations/lightning>`_.
@@ -221,7 +216,6 @@ class WandbLogger(Logger):
         columns = ["caption", "image", "sound"]
         data = [["cheese", wandb.Image(img_1), wandb.Audio(snd_1)], ["wine", wandb.Image(img_2), wandb.Audio(snd_2)]]
         wandb_logger.log_table(key="samples", columns=columns, data=data)
-
 
     **Downloading and Using Artifacts**
 

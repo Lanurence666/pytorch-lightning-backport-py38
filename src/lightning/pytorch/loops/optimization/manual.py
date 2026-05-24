@@ -11,11 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import annotations
 from collections import OrderedDict
-from collections.abc import Mapping
+
 from contextlib import suppress
 from dataclasses import dataclass, field
-from typing import Any
+from typing import Any, Dict, Mapping
 
 from torch import Tensor
 from typing_extensions import override
@@ -28,7 +29,6 @@ from lightning.pytorch.loops.progress import _Progress, _ReadyCompletedTracker
 from lightning.pytorch.trainer import call
 from lightning.pytorch.utilities.exceptions import MisconfigurationException
 from lightning.pytorch.utilities.types import STEP_OUTPUT
-
 
 @dataclass
 class ManualResult(OutputResult):
@@ -65,9 +65,7 @@ class ManualResult(OutputResult):
     def asdict(self) -> dict[str, Any]:
         return self.extra
 
-
-_OUTPUTS_TYPE = dict[str, Any]
-
+_OUTPUTS_TYPE = Dict[str, Any]
 
 class _ManualOptimization(_Loop):
     """A special loop implementing what is known in Lightning as Manual Optimization where the optimization happens

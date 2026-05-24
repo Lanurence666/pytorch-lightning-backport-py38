@@ -12,23 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import annotations
 import logging
 import os
 from collections import Counter
-from collections.abc import Iterable
-from typing import Literal, Optional, Union
+
+from typing import Literal, Optional, Union, Iterable
 
 import torch
 
 from lightning.fabric.connector import _PRECISION_INPUT, _PRECISION_INPUT_STR, _convert_precision_to_unified_args
-from lightning.fabric.plugins.environments import (
-    ClusterEnvironment,
-    LightningEnvironment,
-    LSFEnvironment,
-    MPIEnvironment,
-    SLURMEnvironment,
-    TorchElasticEnvironment,
-)
+from lightning.fabric.plugins.environments import ClusterEnvironment, LightningEnvironment, LSFEnvironment, MPIEnvironment, SLURMEnvironment, TorchElasticEnvironment
 from lightning.fabric.utilities.device_parser import _determine_root_gpu_device, _select_auto_accelerator
 from lightning.fabric.utilities.imports import _IS_INTERACTIVE
 from lightning.pytorch.accelerators import AcceleratorRegistry
@@ -36,32 +30,9 @@ from lightning.pytorch.accelerators.accelerator import Accelerator
 from lightning.pytorch.accelerators.cuda import CUDAAccelerator
 from lightning.pytorch.accelerators.mps import MPSAccelerator
 from lightning.pytorch.accelerators.xla import XLAAccelerator
-from lightning.pytorch.plugins import (
-    _PLUGIN_INPUT,
-    BitsandbytesPrecision,
-    CheckpointIO,
-    DeepSpeedPrecision,
-    DoublePrecision,
-    FSDPPrecision,
-    HalfPrecision,
-    MixedPrecision,
-    Precision,
-    TransformerEnginePrecision,
-    XLAPrecision,
-)
+from lightning.pytorch.plugins import _PLUGIN_INPUT, BitsandbytesPrecision, CheckpointIO, DeepSpeedPrecision, DoublePrecision, FSDPPrecision, HalfPrecision, MixedPrecision, Precision, TransformerEnginePrecision, XLAPrecision
 from lightning.pytorch.plugins.layer_sync import LayerSync, TorchSyncBatchNorm
-from lightning.pytorch.strategies import (
-    DDPStrategy,
-    DeepSpeedStrategy,
-    FSDPStrategy,
-    ModelParallelStrategy,
-    ParallelStrategy,
-    SingleDeviceStrategy,
-    SingleDeviceXLAStrategy,
-    Strategy,
-    StrategyRegistry,
-    XLAStrategy,
-)
+from lightning.pytorch.strategies import DDPStrategy, DeepSpeedStrategy, FSDPStrategy, ModelParallelStrategy, ParallelStrategy, SingleDeviceStrategy, SingleDeviceXLAStrategy, Strategy, StrategyRegistry, XLAStrategy
 from lightning.pytorch.strategies.ddp import _DDP_FORK_ALIASES
 from lightning.pytorch.utilities.exceptions import MisconfigurationException
 from lightning.pytorch.utilities.rank_zero import rank_zero_info, rank_zero_warn
@@ -69,7 +40,6 @@ from lightning.pytorch.utilities.rank_zero import rank_zero_info, rank_zero_warn
 log = logging.getLogger(__name__)
 
 _LITERAL_WARN = Literal["warn"]
-
 
 class _AcceleratorConnector:
     def __init__(
@@ -566,7 +536,6 @@ class _AcceleratorConnector:
             # Used for custom plugins. They should implement this property
             return self.strategy.is_distributed
         return False
-
 
 def _set_torch_flags(
     *, deterministic: Optional[Union[bool, _LITERAL_WARN]] = None, benchmark: Optional[bool] = None

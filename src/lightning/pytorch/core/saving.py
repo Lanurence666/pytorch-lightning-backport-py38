@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import annotations
 import ast
 import contextlib
 import csv
@@ -30,8 +31,7 @@ import yaml
 from lightning_utilities.core.apply_func import apply_to_collection
 
 import lightning.pytorch as pl
-from lightning.fabric.utilities.cloud_io import _is_dir, get_filesystem
-from lightning.fabric.utilities.cloud_io import _load as pl_load
+from lightning.fabric.utilities.cloud_io import _is_dir, get_filesystem, _load as pl_load
 from lightning.fabric.utilities.data import AttributeDict
 from lightning.fabric.utilities.types import _MAP_LOCATION_TYPE, _PATH
 from lightning.pytorch.accelerators import CUDAAccelerator, MPSAccelerator, XLAAccelerator

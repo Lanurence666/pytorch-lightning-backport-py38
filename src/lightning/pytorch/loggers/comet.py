@@ -1,3 +1,4 @@
+from __future__ import annotations
 # Copyright The Lightning AI team.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,8 +20,8 @@ Comet Logger
 import logging
 import os
 from argparse import Namespace
-from collections.abc import Mapping
-from typing import TYPE_CHECKING, Any, Literal, Optional, Union
+
+from typing import TYPE_CHECKING, Any, Literal, Optional, Union, Mapping
 
 from lightning_utilities.core.imports import RequirementCache
 from torch import Tensor
@@ -40,7 +41,6 @@ _COMET_AVAILABLE = RequirementCache("comet-ml>=3.44.4", module="comet_ml")
 
 FRAMEWORK_NAME = "pytorch-lightning"
 comet_experiment = Union["Experiment", "ExistingExperiment", "OfflineExperiment"]
-
 
 class CometLogger(Logger):
     r"""Track your parameters, metrics, source code and more using `Comet

@@ -1,3 +1,4 @@
+from __future__ import annotations
 # Copyright The Lightning AI team.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,7 +21,7 @@ Trainer also calls ``optimizer.step()`` for the last indivisible step number.
 
 """
 
-from typing import Any
+from typing import Any, Dict
 
 from typing_extensions import override
 
@@ -64,7 +65,7 @@ class GradientAccumulationScheduler(Callback):
 
     """
 
-    def __init__(self, scheduling: dict[int, int]):
+    def __init__(self, scheduling: Dict[int, int]):
         super().__init__()
 
         if not scheduling:  # empty dict error

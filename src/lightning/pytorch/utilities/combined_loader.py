@@ -11,9 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import annotations
 import contextlib
-from collections.abc import Iterable, Iterator
-from typing import Any, Callable, Literal, Optional, Union
+
+from typing import Any, Callable, Literal, Optional, Union, Tuple, Iterable, Iterator
 
 from torch.utils.data.dataloader import _BaseDataLoaderIter, _MultiProcessingDataLoaderIter
 from typing_extensions import Self, TypedDict, override
@@ -22,8 +23,7 @@ from lightning.fabric.utilities.data import sized_len
 from lightning.fabric.utilities.types import _Stateful
 from lightning.pytorch.utilities._pytree import _map_and_unflatten, _tree_flatten, tree_unflatten
 
-_ITERATOR_RETURN = tuple[Any, int, int]  # batch, batch_idx, dataloader_idx
-
+_ITERATOR_RETURN = Tuple[Any, int, int]  # batch, batch_idx, dataloader_idx
 
 class _ModeIterator(Iterator[_ITERATOR_RETURN]):
     def __init__(self, iterables: list[Iterable], limits: Optional[list[Union[int, float]]] = None) -> None:
@@ -62,7 +62,6 @@ class _ModeIterator(Iterator[_ITERATOR_RETURN]):
         ]
 
         return state
-
 
 class _MaxSizeCycle(_ModeIterator):
     def __init__(self, iterables: list[Iterable], limits: Optional[list[Union[int, float]]] = None) -> None:
@@ -105,7 +104,6 @@ class _MaxSizeCycle(_ModeIterator):
         super().reset()
         self._consumed = []
 
-
 class _MinSize(_ModeIterator):
     @override
     def __next__(self) -> _ITERATOR_RETURN:
@@ -118,7 +116,6 @@ class _MinSize(_ModeIterator):
     def __len__(self) -> int:
         lengths = _get_iterables_lengths(self.iterables)
         return min(lengths + self.limits) if self.limits is not None else min(lengths)  # type: ignore[return-value]
-
 
 class _Sequential(_ModeIterator):
     def __init__(self, iterables: list[Iterable], limits: Optional[list[Union[int, float]]] = None) -> None:
@@ -180,7 +177,6 @@ class _Sequential(_ModeIterator):
         self._idx = 0
         self._load_current_iterator()
 
-
 class _MaxSize(_ModeIterator):
     @override
     def __next__(self) -> _ITERATOR_RETURN:
@@ -204,11 +200,9 @@ class _MaxSize(_ModeIterator):
             return max(min(length, limit) for length, limit in zip(lengths, self.limits))  # type: ignore[return-value]
         return max(lengths)  # type: ignore[return-value]
 
-
 class _CombinationMode(TypedDict):
     fn: Callable[[list[int]], int]
     iterator: type[_ModeIterator]
-
 
 _SUPPORTED_MODES = {
     "min_size": _CombinationMode(fn=min, iterator=_MinSize),
@@ -217,7 +211,6 @@ _SUPPORTED_MODES = {
     "sequential": _CombinationMode(fn=sum, iterator=_Sequential),
 }
 _LITERAL_SUPPORTED_MODES = Literal["min_size", "max_size_cycle", "max_size", "sequential"]
-
 
 class CombinedLoader(Iterable):
     """Combines different iterables under specific sampling modes.
@@ -393,13 +386,11 @@ class CombinedLoader(Iterable):
         for loader, state_dict in zip(stateful_loaders, states):
             loader.load_state_dict(state_dict)
 
-
 def _shutdown_workers_and_reset_iterator(dataloader: object) -> None:
     if hasattr(dataloader, "_iterator"):
         if isinstance(dataloader._iterator, _MultiProcessingDataLoaderIter):
             dataloader._iterator._shutdown_workers()
         dataloader._iterator = None
-
 
 def _get_iterables_lengths(iterables: list[Iterable]) -> list[Union[int, float]]:
     return [(float("inf") if (length := sized_len(iterable)) is None else length) for iterable in iterables]

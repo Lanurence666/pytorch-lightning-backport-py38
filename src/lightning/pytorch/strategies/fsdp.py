@@ -11,20 +11,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import annotations
 import logging
 import shutil
-from collections.abc import Generator, Mapping
+
 from contextlib import contextmanager, nullcontext
 from datetime import timedelta
 from pathlib import Path
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    Callable,
-    Literal,
-    Optional,
-    Union,
-)
+from typing import TYPE_CHECKING, Any, Callable, Literal, Optional, Union, Type, Set, Generator, Mapping
 
 import torch
 from lightning_utilities.core.rank_zero import rank_zero_only as utils_rank_zero_only
@@ -37,31 +31,9 @@ import lightning.pytorch as pl
 from lightning.fabric.plugins import CheckpointIO, ClusterEnvironment
 from lightning.fabric.plugins.collectives.torch_collective import default_pg_timeout
 from lightning.fabric.strategies import _StrategyRegistry
-from lightning.fabric.strategies.fsdp import (
-    _METADATA_FILENAME,
-    _activation_checkpointing_kwargs,
-    _auto_wrap_policy_kwargs,
-    _distributed_checkpoint_load,
-    _distributed_checkpoint_save,
-    _get_full_state_dict_context,
-    _get_sharded_state_dict_context,
-    _init_cpu_offload,
-    _init_sharding_strategy,
-    _is_full_checkpoint,
-    _is_sharded_checkpoint,
-    _move_torchmetrics_to_device,
-    _optimizer_has_flat_params,
-    _setup_activation_checkpointing,
-    _warn_if_shared_params_across_fsdp_units,
-)
+from lightning.fabric.strategies.fsdp import _METADATA_FILENAME, _activation_checkpointing_kwargs, _auto_wrap_policy_kwargs, _distributed_checkpoint_load, _distributed_checkpoint_save, _get_full_state_dict_context, _get_sharded_state_dict_context, _init_cpu_offload, _init_sharding_strategy, _is_full_checkpoint, _is_sharded_checkpoint, _move_torchmetrics_to_device, _optimizer_has_flat_params, _setup_activation_checkpointing, _warn_if_shared_params_across_fsdp_units
 from lightning.fabric.strategies.model_parallel import _load_raw_module_state
-from lightning.fabric.utilities.distributed import (
-    _distributed_is_initialized,
-    _get_default_process_group_backend_for_device,
-    _init_dist_connection,
-    _sync_ddp_if_available,
-)
-from lightning.fabric.utilities.distributed import group as _group
+from lightning.fabric.utilities.distributed import _distributed_is_initialized, _get_default_process_group_backend_for_device, _init_dist_connection, _sync_ddp_if_available, group as _group
 from lightning.fabric.utilities.imports import _TORCH_GREATER_EQUAL_2_2, _TORCH_GREATER_EQUAL_2_3
 from lightning.fabric.utilities.init import _has_meta_device_parameters_or_buffers
 from lightning.fabric.utilities.load import _lazy_load, _materialize_tensors
@@ -83,12 +55,10 @@ if TYPE_CHECKING:
     from torch.distributed.fsdp.fully_sharded_data_parallel import CPUOffload, MixedPrecision, ShardingStrategy
     from torch.distributed.fsdp.wrap import ModuleWrapPolicy
 
-    _POLICY = Union[set[type[Module]], Callable[[Module, bool, int], bool], ModuleWrapPolicy]
+    _POLICY = Union[Set[Type[Module]], Callable[[Module, bool, int], bool], ModuleWrapPolicy]
     _SHARDING_STRATEGY = Union[ShardingStrategy, Literal["FULL_SHARD", "SHARD_GRAD_OP", "NO_SHARD", "HYBRID_SHARD"]]
 
-
 log = logging.getLogger(__name__)
-
 
 class FSDPStrategy(ParallelStrategy):
     r"""Strategy for Fully Sharded Data Parallel provided by torch.distributed.

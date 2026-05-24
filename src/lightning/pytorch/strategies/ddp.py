@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import annotations
 import logging
 from contextlib import nullcontext
 from datetime import timedelta
@@ -29,13 +30,7 @@ import lightning.pytorch as pl
 from lightning.fabric.plugins import CheckpointIO, ClusterEnvironment
 from lightning.fabric.plugins.collectives.torch_collective import default_pg_timeout
 from lightning.fabric.strategies import _StrategyRegistry
-from lightning.fabric.utilities.distributed import (
-    _distributed_is_initialized,
-    _get_default_process_group_backend_for_device,
-    _init_dist_connection,
-    _sync_ddp_if_available,
-)
-from lightning.fabric.utilities.distributed import group as _group
+from lightning.fabric.utilities.distributed import _distributed_is_initialized, _get_default_process_group_backend_for_device, _init_dist_connection, _sync_ddp_if_available, group as _group
 from lightning.fabric.utilities.imports import _IS_WINDOWS, _TORCH_GREATER_EQUAL_2_3
 from lightning.fabric.utilities.optimizer import _optimizers_to_device
 from lightning.fabric.utilities.seed import reset_seed

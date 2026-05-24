@@ -1,3 +1,4 @@
+from __future__ import annotations
 """Demo of a simple transformer language model.
 
 Code is adapted from the PyTorch examples at

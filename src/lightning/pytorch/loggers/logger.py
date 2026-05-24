@@ -1,4 +1,4 @@
-# Copyright The Lightning AI team.
+﻿# Copyright The Lightning AI team.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,16 +18,14 @@ import operator
 import statistics
 from abc import ABC
 from collections import defaultdict
-from collections.abc import Mapping, Sequence
-from typing import Any, Callable, Optional
+
+from typing import Any, Callable, Optional, Sequence, Mapping
 
 from typing_extensions import override
 
 from lightning.fabric.loggers import Logger as FabricLogger
-from lightning.fabric.loggers.logger import _DummyExperiment as DummyExperiment  # for backward compatibility
-from lightning.fabric.loggers.logger import rank_zero_experiment  # noqa: F401  # for backward compatibility
+from lightning.fabric.loggers.logger import _DummyExperiment as DummyExperiment, rank_zero_experiment  # noqa: F401  # for backward compatibility
 from lightning.pytorch.callbacks.model_checkpoint import ModelCheckpoint
-
 
 class Logger(FabricLogger, ABC):
     """Base class for experiment loggers."""
@@ -46,7 +44,6 @@ class Logger(FabricLogger, ABC):
         """Return the root directory where experiment logs get saved, or `None` if the logger does not save data
         locally."""
         return None
-
 
 class DummyLogger(Logger):
     """Dummy logger for internal use.
@@ -95,7 +92,6 @@ class DummyLogger(Logger):
             return None
 
         return method
-
 
 # TODO: this should have been deprecated
 def merge_dicts(  # pragma: no cover

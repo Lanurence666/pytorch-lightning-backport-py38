@@ -1,3 +1,4 @@
+from __future__ import annotations
 # Copyright The Lightning AI team.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,10 +19,10 @@ ModelPruning
 
 import inspect
 import logging
-from collections.abc import Sequence
+
 from copy import deepcopy
 from functools import partial
-from typing import Any, Callable, Optional, Union
+from typing import Any, Callable, Optional, Union, Tuple, Dict, Sequence
 
 import torch.nn.utils.prune as pytorch_prune
 from lightning_utilities.core.apply_func import apply_to_collection
@@ -50,15 +51,13 @@ _PYTORCH_PRUNING_METHOD = {
     "random_unstructured": pytorch_prune.RandomUnstructured,
 }
 
-_PARAM_TUPLE = tuple[nn.Module, str]
+_PARAM_TUPLE = Tuple[nn.Module, str]
 _PARAM_LIST = Sequence[_PARAM_TUPLE]
 _MODULE_CONTAINERS = (LightningModule, nn.Sequential, nn.ModuleList, nn.ModuleDict)
-
 
 class _LayerRef(TypedDict):
     data: nn.Module
     names: list[tuple[int, str]]
-
 
 class ModelPruning(Callback):
     PARAMETER_NAMES = ("weight", "bias")

@@ -12,9 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import logging
-from collections.abc import Mapping
 from contextlib import AbstractContextManager, ExitStack
-from typing import TYPE_CHECKING, Any, Literal, Optional, Union
+from typing import TYPE_CHECKING, Any, Literal, Optional, Union, Mapping
 
 import torch
 from lightning_utilities import apply_to_collection
@@ -23,11 +22,7 @@ from torch import Tensor
 from typing_extensions import override
 
 from lightning.fabric.plugins.precision.precision import Precision
-from lightning.fabric.plugins.precision.utils import (
-    _ClassReplacementContextManager,
-    _convert_fp_tensor,
-    _DtypeContextManager,
-)
+from lightning.fabric.plugins.precision.utils import _ClassReplacementContextManager, _convert_fp_tensor, _DtypeContextManager
 from lightning.fabric.utilities.rank_zero import rank_zero_info, rank_zero_warn
 
 if TYPE_CHECKING:

@@ -11,8 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import annotations
 import logging
-from importlib.metadata import entry_points
+try:
+    from importlib.metadata import entry_points
+except ImportError:
+    from importlib_metadata import entry_points
 from inspect import getmembers, isclass
 from types import ModuleType
 from typing import Any, Union
@@ -34,7 +38,7 @@ def _load_external_callbacks(group: str) -> list[Any]:
         A list of all callbacks collected from external factories.
 
     """
-    factories = entry_points(group=group)
+    factories = entry_points().get(group, []) if isinstance(entry_points(), dict) else entry_points(group=group)
 
     external_callbacks: list[Any] = []
     for factory in factories:

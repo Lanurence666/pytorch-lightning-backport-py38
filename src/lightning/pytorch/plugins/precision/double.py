@@ -11,9 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from collections.abc import Generator, Iterable
+
 from contextlib import AbstractContextManager, contextmanager
-from typing import Any, Literal
+from typing import Any, Literal, Iterable, Generator
 
 import torch
 import torch.nn as nn
@@ -26,7 +26,6 @@ from lightning.fabric.plugins.precision.utils import _convert_fp_tensor, _DtypeC
 from lightning.fabric.utilities.device_dtype_mixin import _DeviceDtypeModuleMixin
 from lightning.pytorch.plugins.precision.precision import Precision
 from lightning.pytorch.utilities.rank_zero import rank_zero_deprecation
-
 
 class DoublePrecision(Precision):
     """Plugin for training with double (``torch.float64``) precision."""
@@ -59,7 +58,6 @@ class DoublePrecision(Precision):
     @override
     def convert_input(self, data: Any) -> Any:
         return apply_to_collection(data, function=_convert_fp_tensor, dtype=Tensor, dst_type=torch.double)
-
 
 class LightningDoublePrecisionModule(_DeviceDtypeModuleMixin, nn.Module):
     """LightningModule wrapper which converts incoming floating point data in ``*_step`` and ``forward`` to double

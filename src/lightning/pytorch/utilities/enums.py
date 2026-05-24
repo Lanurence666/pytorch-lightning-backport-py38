@@ -1,3 +1,4 @@
+from __future__ import annotations
 # Copyright The Lightning AI team.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +14,6 @@
 # limitations under the License.
 """Enumerated utilities."""
 
-from __future__ import annotations
 
 from lightning_utilities.core.enums import StrEnum as LightningEnum
 

@@ -11,15 +11,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import annotations
 import math
 import os
 import shutil
 import sys
 import time
 from collections import ChainMap, OrderedDict, defaultdict
-from collections.abc import Iterable, Iterator
+
 from dataclasses import dataclass
-from typing import Any, Optional, Union
+from typing import Any, Optional, Union, List, Iterable, Iterator
 
 from lightning_utilities.core.apply_func import apply_to_collection
 from torch import Tensor
@@ -31,14 +32,7 @@ from lightning.pytorch.loops.loop import _Loop
 from lightning.pytorch.loops.progress import _BatchProgress
 from lightning.pytorch.loops.utilities import _no_grad_context, _select_data_fetcher, _verify_dataloader_idx_requirement
 from lightning.pytorch.trainer import call
-from lightning.pytorch.trainer.connectors.data_connector import (
-    _check_dataloader_iterable,
-    _DataLoaderSource,
-    _parse_num_batches,
-    _process_dataloader,
-    _request_dataloader,
-    _resolve_overfit_batches,
-)
+from lightning.pytorch.trainer.connectors.data_connector import _check_dataloader_iterable, _DataLoaderSource, _parse_num_batches, _process_dataloader, _request_dataloader, _resolve_overfit_batches
 from lightning.pytorch.trainer.connectors.logger_connector.result import _OUT_DICT, _ResultCollection
 from lightning.pytorch.trainer.states import RunningStage, TrainerFn
 from lightning.pytorch.utilities.combined_loader import CombinedLoader
@@ -48,12 +42,10 @@ from lightning.pytorch.utilities.imports import _RICH_AVAILABLE
 from lightning.pytorch.utilities.model_helpers import _ModuleMode, is_overridden
 from lightning.pytorch.utilities.signature_utils import is_param_in_hook_signature
 
-
 @dataclass
 class RestartStage:
     NONE = "none"
     RESTARTED_MID_EVALUATION = "restarted_mid_evaluation"
-
 
 class _EvaluationLoop(_Loop):
     """Top-level loop where validation/testing starts."""
@@ -298,7 +290,7 @@ class _EvaluationLoop(_Loop):
         logged_outputs, self._logged_outputs = self._logged_outputs, []  # free memory
         # include any logged outputs on epoch_end
         epoch_end_logged_outputs = self.trainer._logger_connector.update_eval_epoch_metrics()
-        all_logged_outputs = dict(ChainMap(*logged_outputs))  # list[dict] -> dict
+        all_logged_outputs = dict(ChainMap(*logged_outputs))  # List[dict] -> dict
         all_logged_outputs.update(epoch_end_logged_outputs)
         for dl_outputs in logged_outputs:
             dl_outputs.update(epoch_end_logged_outputs)

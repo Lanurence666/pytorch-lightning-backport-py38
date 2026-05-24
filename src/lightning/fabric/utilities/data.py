@@ -12,14 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import annotations
 import functools
 import inspect
 import os
 from collections import OrderedDict
-from collections.abc import Generator, Iterable, Sized
+from collections.abc import Sized
 from contextlib import contextmanager
 from functools import partial
-from typing import Any, Callable, Optional, Union
+from typing import Any, Callable, Optional, Union, Generator, Iterable
 
 from lightning_utilities.core.inheritance import get_all_subclasses
 from torch.utils.data import BatchSampler, DataLoader, IterableDataset, Sampler
@@ -30,7 +31,6 @@ from lightning.fabric.utilities.exceptions import MisconfigurationException
 from lightning.fabric.utilities.rank_zero import rank_zero_warn
 from lightning.fabric.utilities.seed import pl_worker_init_function
 
-
 class _WrapAttrTag(LightningEnum):
     SET = "set"
     DEL = "del"
@@ -40,10 +40,8 @@ class _WrapAttrTag(LightningEnum):
         fn = setattr if self == self.SET else delattr
         return fn(*args)
 
-
 def has_iterable_dataset(dataloader: object) -> bool:
     return hasattr(dataloader, "dataset") and isinstance(dataloader.dataset, IterableDataset)
-
 
 def sized_len(dataloader: object) -> Optional[int]:
     """Try to get the length of an object, return ``None`` otherwise."""
@@ -53,7 +51,6 @@ def sized_len(dataloader: object) -> Optional[int]:
     except (TypeError, NotImplementedError):
         length = None
     return length
-
 
 def has_len(dataloader: object) -> TypeGuard[Sized]:
     """Checks if a given object has ``__len__`` method implemented."""
@@ -71,11 +68,9 @@ def has_len(dataloader: object) -> TypeGuard[Sized]:
         )
     return length is not None
 
-
 def _update_dataloader(dataloader: DataLoader, sampler: Union[Sampler, Iterable]) -> DataLoader:
     dl_args, dl_kwargs = _get_dataloader_init_args_and_kwargs(dataloader, sampler)
     return _reinstantiate_wrapped_cls(dataloader, *dl_args, **dl_kwargs)
-
 
 def _get_dataloader_init_args_and_kwargs(
     dataloader: DataLoader,
@@ -169,7 +164,6 @@ def _get_dataloader_init_args_and_kwargs(
 
     return dl_args, dl_kwargs
 
-
 def _dataloader_init_kwargs_resolve_sampler(
     dataloader: DataLoader,
     sampler: Union[Sampler, Iterable],
@@ -242,13 +236,11 @@ def _dataloader_init_kwargs_resolve_sampler(
 
     return {"sampler": sampler, "shuffle": False, "batch_sampler": None}
 
-
 def _auto_add_worker_init_fn(dataloader: object, rank: int) -> None:
     if not hasattr(dataloader, "worker_init_fn"):
         return
     if int(os.environ.get("PL_SEED_WORKERS", 0)) and dataloader.worker_init_fn is None:
         dataloader.worker_init_fn = partial(pl_worker_init_function, rank=rank)
-
 
 def _reinstantiate_wrapped_cls(orig_object: Any, *args: Any, explicit_cls: Optional[type] = None, **kwargs: Any) -> Any:
     constructor = type(orig_object) if explicit_cls is None else explicit_cls
@@ -279,7 +271,6 @@ def _reinstantiate_wrapped_cls(orig_object: Any, *args: Any, explicit_cls: Optio
         fn(result, *args)
 
     return result
-
 
 def _wrap_init_method(init: Callable, store_explicit_arg: Optional[str] = None) -> Callable:
     """Wraps the ``__init__`` method of classes (currently :class:`~torch.utils.data.DataLoader` and
@@ -327,7 +318,6 @@ def _wrap_init_method(init: Callable, store_explicit_arg: Optional[str] = None) 
 
     return wrapper
 
-
 def _wrap_attr_method(method: Callable, tag: _WrapAttrTag) -> Callable:
     """Wraps the ``__setattr__`` or ``__delattr__`` method of classes (currently :class:`~torch.utils.data.DataLoader`
     and :class:`~torch.utils.data.BatchSampler`) in order to enable re- instantiation of custom subclasses."""
@@ -353,7 +343,6 @@ def _wrap_attr_method(method: Callable, tag: _WrapAttrTag) -> Callable:
         object.__setattr__(obj, "__pl_current_call", (prev_call_name, prev_call_method))
 
     return wrapper
-
 
 @contextmanager
 def _replace_dunder_methods(base_cls: type, store_explicit_arg: Optional[str] = None) -> Generator[None, None, None]:
@@ -390,7 +379,6 @@ def _replace_dunder_methods(base_cls: type, store_explicit_arg: Optional[str] = 
                 except AttributeError:
                     pass
 
-
 def _replace_value_in_saved_args(
     replace_key: str,
     replace_value: Any,
@@ -415,7 +403,6 @@ def _replace_value_in_saved_args(
 
     return False, args, kwargs
 
-
 def _set_sampler_epoch(dataloader: object, epoch: int) -> None:
     """Calls the ``set_epoch`` method on either the sampler of the given dataloader.
 
@@ -439,7 +426,6 @@ def _set_sampler_epoch(dataloader: object, epoch: int) -> None:
         if callable(set_epoch):
             set_epoch(epoch)
 
-
 def suggested_max_num_workers(local_world_size: int) -> int:
     """Suggests an upper bound of ``num_workers`` to use in a PyTorch :class:`~torch.utils.data.DataLoader` based on
     the number of CPU cores available on the system and the number of distributed processes in the current machine.
@@ -454,14 +440,12 @@ def suggested_max_num_workers(local_world_size: int) -> int:
     cpu_count = _num_cpus_available()
     return max(1, cpu_count // local_world_size - 1)  # -1 to leave some resources for main process
 
-
 def _num_cpus_available() -> int:
     if hasattr(os, "sched_getaffinity"):
         return len(os.sched_getaffinity(0))
 
     cpu_count = os.cpu_count()
     return 1 if cpu_count is None else cpu_count
-
 
 class AttributeDict(dict):
     """A container to store state variables of your program.

@@ -11,8 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import annotations
 from contextlib import AbstractContextManager
-from typing import TYPE_CHECKING, Any, Literal, Optional
+from typing import TYPE_CHECKING, Any, Literal, Optional, Type
 
 import torch
 from lightning_utilities import apply_to_collection
@@ -73,7 +74,7 @@ class FSDPPrecision(Precision):
             "16-true": torch.float16,
             "32-true": torch.float32,
         }
-        self._desired_input_dtype = precision_to_type[self.precision]
+        self._desired_input_dtype = precision_to_Type[self.precision]
 
     @override
     def convert_module(self, module: Module) -> Module:

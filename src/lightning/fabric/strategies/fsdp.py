@@ -11,21 +11,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import annotations
 import shutil
 import warnings
-from collections.abc import Generator
+
 from contextlib import AbstractContextManager, ExitStack, nullcontext
 from datetime import timedelta
 from functools import partial
 from pathlib import Path
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    Callable,
-    Literal,
-    Optional,
-    Union,
-)
+from typing import TYPE_CHECKING, Any, Callable, Literal, Optional, Union, Type, Set, Generator
 
 import torch
 from lightning_utilities.core.imports import RequirementCache
@@ -42,25 +36,9 @@ from lightning.fabric.plugins.precision.fsdp import FSDPPrecision
 from lightning.fabric.strategies.launchers.subprocess_script import _SubprocessScriptLauncher
 from lightning.fabric.strategies.parallel import ParallelStrategy
 from lightning.fabric.strategies.registry import _StrategyRegistry
-from lightning.fabric.strategies.strategy import (
-    TBroadcast,
-    _apply_filter,
-    _BackwardSyncControl,
-    _Sharded,
-    _validate_keys_for_strict_loading,
-)
-from lightning.fabric.utilities.distributed import (
-    ReduceOp,
-    _distributed_is_initialized,
-    _get_default_process_group_backend_for_device,
-    _init_dist_connection,
-    _sync_ddp_if_available,
-)
-from lightning.fabric.utilities.distributed import group as _group
-from lightning.fabric.utilities.imports import (
-    _TORCH_GREATER_EQUAL_2_2,
-    _TORCH_GREATER_EQUAL_2_3,
-)
+from lightning.fabric.strategies.strategy import TBroadcast, _apply_filter, _BackwardSyncControl, _Sharded, _validate_keys_for_strict_loading
+from lightning.fabric.utilities.distributed import ReduceOp, _distributed_is_initialized, _get_default_process_group_backend_for_device, _init_dist_connection, _sync_ddp_if_available, group as _group
+from lightning.fabric.utilities.imports import _TORCH_GREATER_EQUAL_2_2, _TORCH_GREATER_EQUAL_2_3
 from lightning.fabric.utilities.init import _has_meta_device_parameters_or_buffers
 from lightning.fabric.utilities.load import _METADATA_FILENAME, _lazy_load, _materialize_tensors, _move_state_into
 from lightning.fabric.utilities.rank_zero import rank_zero_deprecation, rank_zero_only, rank_zero_warn
@@ -73,15 +51,13 @@ if TYPE_CHECKING:
     from torch.distributed.fsdp.wrap import ModuleWrapPolicy
     from torch.optim.lr_scheduler import _LRScheduler
 
-    _POLICY = Union[set[type[Module]], Callable[[Module, bool, int], bool], ModuleWrapPolicy]
+    _POLICY = Union[Set[Type[Module]], Callable[[Module, bool, int], bool], ModuleWrapPolicy]
     _SHARDING_STRATEGY = Union[ShardingStrategy, Literal["FULL_SHARD", "SHARD_GRAD_OP", "NO_SHARD", "HYBRID_SHARD"]]
-
 
 _FSDP_ALIASES = ("fsdp", "fsdp_cpu_offload")
 
 # TODO: Switch to new state-dict APIs
 warnings.filterwarnings("ignore", category=FutureWarning, message=".*FSDP.state_dict_type.*")  # from torch >= 2.4
-
 
 class FSDPStrategy(ParallelStrategy, _Sharded):
     r"""Strategy for Fully Sharded Data Parallel provided by torch.distributed.
@@ -602,10 +578,7 @@ class FSDPStrategy(ParallelStrategy, _Sharded):
         if _is_full_checkpoint(path):
             checkpoint = _lazy_load(path)
 
-            from lightning.fabric.strategies.model_parallel import (
-                _load_raw_module_state,
-                _rekey_optimizer_state_if_needed,
-            )
+            from lightning.fabric.strategies.model_parallel import _load_raw_module_state, _rekey_optimizer_state_if_needed
 
             _load_raw_module_state(checkpoint.pop(module_key), module=module, world_size=self.world_size, strict=strict)
 
@@ -681,7 +654,6 @@ class FSDPStrategy(ParallelStrategy, _Sharded):
         # additionally, for some implementations, the setter is a no-op, so it's safer to access the getter
         rank_zero_only.rank = utils_rank_zero_only.rank = self.global_rank
 
-
 def _activation_checkpointing_kwargs(
     activation_checkpointing: Optional[Union[type[Module], list[type[Module]]]],
     activation_checkpointing_policy: Optional["_POLICY"],
@@ -706,7 +678,6 @@ def _activation_checkpointing_kwargs(
         return _auto_wrap_policy_kwargs(activation_checkpointing_policy, {})
     return {"auto_wrap_policy": activation_checkpointing_policy}
 
-
 def _auto_wrap_policy_kwargs(policy: Optional["_POLICY"], kwargs: dict) -> dict:
     if policy is None:
         return kwargs
@@ -717,7 +688,6 @@ def _auto_wrap_policy_kwargs(policy: Optional["_POLICY"], kwargs: dict) -> dict:
 
     kwargs["auto_wrap_policy"] = policy
     return kwargs
-
 
 def _warn_if_shared_params_across_fsdp_units(module: Module, policy: Any) -> None:
     """Detect shared (tied) parameters that would be split across separate FSDP units by the wrap policy.
@@ -788,7 +758,6 @@ def _warn_if_shared_params_across_fsdp_units(module: Module, policy: Any) -> Non
                 category=UserWarning,
             )
 
-
 def _setup_activation_checkpointing(module: Module, activation_checkpointing_kwargs: dict) -> None:
     if not activation_checkpointing_kwargs:
         return
@@ -802,16 +771,11 @@ def _setup_activation_checkpointing(module: Module, activation_checkpointing_kwa
         )
         return
 
-    from torch.distributed.algorithms._checkpoint.checkpoint_wrapper import (
-        CheckpointImpl,
-        apply_activation_checkpointing,
-        checkpoint_wrapper,
-    )
+    from torch.distributed.algorithms._checkpoint.checkpoint_wrapper import CheckpointImpl, apply_activation_checkpointing, checkpoint_wrapper
 
     if not _TORCH_GREATER_EQUAL_2_2:
         checkpoint_wrapper = partial(checkpoint_wrapper, checkpoint_impl=CheckpointImpl.NO_REENTRANT)
     apply_activation_checkpointing(module, checkpoint_wrapper_fn=checkpoint_wrapper, **activation_checkpointing_kwargs)
-
 
 class _FSDPBackwardSyncControl(_BackwardSyncControl):
     @override
@@ -831,12 +795,10 @@ class _FSDPBackwardSyncControl(_BackwardSyncControl):
             )
         return module.no_sync()
 
-
 def _init_cpu_offload(cpu_offload: Optional[Union[bool, "CPUOffload"]]) -> "CPUOffload":
     from torch.distributed.fsdp import CPUOffload
 
     return cpu_offload if isinstance(cpu_offload, CPUOffload) else CPUOffload(offload_params=bool(cpu_offload))
-
 
 def _init_sharding_strategy(sharding_strategy: "_SHARDING_STRATEGY", kwargs: dict) -> "ShardingStrategy":
     from torch.distributed.fsdp import ShardingStrategy
@@ -860,12 +822,10 @@ def _init_sharding_strategy(sharding_strategy: "_SHARDING_STRATEGY", kwargs: dic
         )
     return strategy
 
-
 def _optimizer_has_flat_params(optimizer: Optimizer) -> bool:
     return any(
         getattr(param, "_fsdp_flattened", False) for group in optimizer.param_groups for param in group["params"]
     )
-
 
 def _get_sharded_state_dict_context(module: Module) -> Generator[None, None, None]:
     from torch.distributed.fsdp import FullyShardedDataParallel as FSDP
@@ -880,7 +840,6 @@ def _get_sharded_state_dict_context(module: Module) -> Generator[None, None, Non
         optim_state_dict_config=optim_state_dict_config,
     )
     return state_dict_type_context  # type: ignore[return-value]
-
 
 def _get_full_state_dict_context(
     module: Module, world_size: int, rank0_only: bool = True
@@ -900,21 +859,17 @@ def _get_full_state_dict_context(
 
     return state_dict_type_context  # type: ignore[return-value]
 
-
 def _is_sharded_checkpoint(path: Path) -> bool:
     """A heuristic check to determine whether the path points to a directory with checkpoint shards."""
     return path.is_dir() and (path / _METADATA_FILENAME).is_file()
 
-
 def _is_full_checkpoint(path: Path) -> bool:
     return path.is_file()
-
 
 def _has_fsdp_modules(module: object) -> TypeGuard[Module]:
     from torch.distributed.fsdp import FullyShardedDataParallel
 
     return isinstance(module, Module) and any(isinstance(m, FullyShardedDataParallel) for m in module.modules())
-
 
 def _move_torchmetrics_to_device(module: torch.nn.Module, device: torch.device) -> None:
     # FSDP doesn't move modules without parameters (e.g. Metrics) to the device
@@ -926,7 +881,6 @@ def _move_torchmetrics_to_device(module: torch.nn.Module, device: torch.device) 
 
     for metric in (m for m in module.modules() if isinstance(m, Metric)):
         metric.to(device)  # `.to()` is in-place
-
 
 def _distributed_checkpoint_save(converted_state: dict[str, Any], path: Path) -> None:
     if _TORCH_GREATER_EQUAL_2_3:
@@ -945,7 +899,6 @@ def _distributed_checkpoint_save(converted_state: dict[str, Any], path: Path) ->
         # FSDP's FileSystemWriter streams the tensors to disk to minimize memory peaks
         writer = FileSystemWriter(path=path, single_file_per_rank=True)
         save(converted_state, writer)
-
 
 def _distributed_checkpoint_load(module_state: dict[str, Any], path: Path) -> None:
     if _TORCH_GREATER_EQUAL_2_3:

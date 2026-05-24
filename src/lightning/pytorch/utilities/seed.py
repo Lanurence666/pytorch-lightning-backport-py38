@@ -1,3 +1,4 @@
+from typing import Generator
 # Copyright The Lightning AI team.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,11 +14,9 @@
 # limitations under the License.
 """Utilities to help with reproducibility of models."""
 
-from collections.abc import Generator
 from contextlib import contextmanager
 
 from lightning.fabric.utilities.seed import _collect_rng_states, _set_rng_states
-
 
 @contextmanager
 def isolate_rng(include_cuda: bool = True) -> Generator[None, None, None]:

@@ -11,10 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import annotations
 import logging
 import os
 import re
-from typing import Any, Optional
+from typing import Any, Optional, Dict
 
 import torch
 from fsspec.core import url_to_fs
@@ -34,10 +35,7 @@ from lightning.pytorch.utilities.exceptions import MisconfigurationException
 from lightning.pytorch.utilities.imports import _OMEGACONF_AVAILABLE
 from lightning.pytorch.utilities.migration import pl_legacy_patch
 from lightning.pytorch.utilities.migration.utils import _pl_migrate_checkpoint
-from lightning.pytorch.utilities.model_registry import (
-    _is_registry,
-    find_model_local_ckpt_path,
-)
+from lightning.pytorch.utilities.model_registry import _is_registry, find_model_local_ckpt_path
 from lightning.pytorch.utilities.rank_zero import rank_zero_info, rank_zero_warn
 
 log = logging.getLogger(__name__)

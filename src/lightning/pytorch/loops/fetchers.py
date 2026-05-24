@@ -12,8 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from collections.abc import Iterator
-from typing import Any, Optional
+from __future__ import annotations
+
+from typing import Any, Optional, Iterator
 
 from typing_extensions import override
 
@@ -21,10 +22,8 @@ from lightning.fabric.utilities.data import sized_len
 from lightning.pytorch.utilities.combined_loader import _ITERATOR_RETURN, CombinedLoader
 from lightning.pytorch.utilities.exceptions import MisconfigurationException
 
-
 def _profile_nothing() -> None:
     pass
-
 
 class _DataFetcher(Iterator):
     def __init__(self) -> None:
@@ -81,7 +80,6 @@ class _DataFetcher(Iterator):
         if self._combined_loader is not None:
             self._combined_loader.reset()
         self.iterator = None
-
 
 class _PrefetchDataFetcher(_DataFetcher):
     """This class is used to control batch fetching flow.
@@ -142,7 +140,6 @@ class _PrefetchDataFetcher(_DataFetcher):
         super().reset()
         self.batches = []
 
-
 class _DataLoaderIterDataFetcher(_DataFetcher):
     """This class is used to return directly the `dataloader_iter` to the ``LightningModule`` training_step for users
     to implement their own pre-fetching logic. This feature can be activated as follows:
@@ -182,7 +179,6 @@ class _DataLoaderIterDataFetcher(_DataFetcher):
         self._batch = None
         self._batch_idx = 0
         self._dataloader_idx = 0
-
 
 class _DataFetcherWrapper(Iterator):
     def __init__(self, data_fetcher: _DataLoaderIterDataFetcher) -> None:

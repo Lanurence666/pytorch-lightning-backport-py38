@@ -12,10 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import annotations
 import os
 from argparse import Namespace
-from collections.abc import Mapping
-from typing import TYPE_CHECKING, Any, Optional, Union
+
+from typing import TYPE_CHECKING, Any, Optional, Union, Mapping
 
 from lightning_utilities.core.imports import RequirementCache
 from torch import Tensor
@@ -24,8 +25,7 @@ from typing_extensions import override
 
 from lightning.fabric.loggers.logger import Logger, rank_zero_experiment
 from lightning.fabric.utilities.cloud_io import _is_dir, get_filesystem
-from lightning.fabric.utilities.logger import _add_prefix, _convert_params, _flatten_dict
-from lightning.fabric.utilities.logger import _sanitize_params as _utils_sanitize_params
+from lightning.fabric.utilities.logger import _add_prefix, _convert_params, _flatten_dict, _sanitize_params as _utils_sanitize_params
 from lightning.fabric.utilities.rank_zero import rank_zero_only, rank_zero_warn
 from lightning.fabric.utilities.types import _PATH
 from lightning.fabric.wrappers import _unwrap_objects
@@ -38,7 +38,6 @@ if TYPE_CHECKING:
         from torch.utils.tensorboard import SummaryWriter
     else:
         from tensorboardX import SummaryWriter  # type: ignore[no-redef]
-
 
 class TensorBoardLogger(Logger):
     r"""Log to local file system in `TensorBoard <https://www.tensorflow.org/tensorboard>`_ format.
@@ -64,7 +63,6 @@ class TensorBoardLogger(Logger):
             arguments in this logger. To automatically flush to disk, `max_queue` sets the size
             of the queue for pending logs before flushing. `flush_secs` determines how many seconds
             elapses before flushing.
-
 
     Example::
 

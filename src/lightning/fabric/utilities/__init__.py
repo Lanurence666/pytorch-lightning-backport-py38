@@ -17,12 +17,7 @@ from lightning.fabric.utilities.apply_func import move_data_to_device
 from lightning.fabric.utilities.data import AttributeDict, suggested_max_num_workers
 from lightning.fabric.utilities.distributed import is_shared_filesystem
 from lightning.fabric.utilities.enums import LightningEnum
-from lightning.fabric.utilities.rank_zero import (
-    rank_zero_deprecation,
-    rank_zero_info,
-    rank_zero_only,
-    rank_zero_warn,
-)
+from lightning.fabric.utilities.rank_zero import rank_zero_deprecation, rank_zero_info, rank_zero_only, rank_zero_warn
 from lightning.fabric.utilities.throughput import Throughput, ThroughputMonitor, measure_flops
 from lightning.fabric.utilities.warnings import disable_possible_user_warnings
 

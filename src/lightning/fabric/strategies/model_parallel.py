@@ -11,13 +11,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import annotations
 import itertools
 import shutil
-from collections.abc import Generator
+
 from contextlib import AbstractContextManager, ExitStack
 from datetime import timedelta
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Callable, Literal, Optional, TypeVar, Union
+from typing import TYPE_CHECKING, Any, Callable, Literal, Optional, TypeVar, Union, Dict, Generator
 
 import torch
 from lightning_utilities.core.rank_zero import rank_zero_only as utils_rank_zero_only
@@ -28,29 +29,11 @@ from typing_extensions import TypeGuard, override
 
 from lightning.fabric.plugins import CheckpointIO
 from lightning.fabric.plugins.collectives.torch_collective import default_pg_timeout
-from lightning.fabric.strategies.fsdp import (
-    _distributed_checkpoint_load,
-    _distributed_checkpoint_save,
-    _get_full_state_dict_context,
-    _is_full_checkpoint,
-    _is_sharded_checkpoint,
-)
+from lightning.fabric.strategies.fsdp import _distributed_checkpoint_load, _distributed_checkpoint_save, _get_full_state_dict_context, _is_full_checkpoint, _is_sharded_checkpoint
 from lightning.fabric.strategies.launchers.subprocess_script import _SubprocessScriptLauncher
 from lightning.fabric.strategies.parallel import ParallelStrategy
-from lightning.fabric.strategies.strategy import (
-    TBroadcast,
-    _apply_filter,
-    _BackwardSyncControl,
-    _validate_keys_for_strict_loading,
-)
-from lightning.fabric.utilities.distributed import (
-    ReduceOp,
-    _distributed_is_initialized,
-    _get_default_process_group_backend_for_device,
-    _init_dist_connection,
-    _sync_ddp_if_available,
-)
-from lightning.fabric.utilities.distributed import group as _group
+from lightning.fabric.strategies.strategy import TBroadcast, _apply_filter, _BackwardSyncControl, _validate_keys_for_strict_loading
+from lightning.fabric.utilities.distributed import ReduceOp, _distributed_is_initialized, _get_default_process_group_backend_for_device, _init_dist_connection, _sync_ddp_if_available, group as _group
 from lightning.fabric.utilities.imports import _TORCH_GREATER_EQUAL_2_3, _TORCH_GREATER_EQUAL_2_4
 from lightning.fabric.utilities.init import _materialize_distributed_module
 from lightning.fabric.utilities.load import _METADATA_FILENAME, _lazy_load, _move_state_into
@@ -62,7 +45,6 @@ if TYPE_CHECKING:
     from torch.distributed.device_mesh import DeviceMesh
 
 TModel = TypeVar("TModel", bound=Module)
-
 
 class ModelParallelStrategy(ParallelStrategy):
     """Enables user-defined parallelism applied to a model.
@@ -319,13 +301,11 @@ class ModelParallelStrategy(ParallelStrategy):
         # additionally, for some implementations, the setter is a no-op, so it's safer to access the getter
         rank_zero_only.rank = utils_rank_zero_only.rank = self.global_rank
 
-
 class _ParallelBackwardSyncControl(_BackwardSyncControl):
     @override
     def no_backward_sync(self, module: Module, enabled: bool) -> AbstractContextManager:
         """Blocks gradient synchronization inside the FSDP2 modules."""
         return _FSDPNoSync(module=module, enabled=enabled)
-
 
 class _FSDPNoSync(AbstractContextManager):
     def __init__(self, module: Module, enabled: bool) -> None:
@@ -344,7 +324,6 @@ class _FSDPNoSync(AbstractContextManager):
 
     def __exit__(self, exc_type: Any, exc_value: Any, traceback: Any) -> None:
         self._set_requires_grad_sync(self._enabled)
-
 
 def _save_checkpoint(
     path: Path,
@@ -406,7 +385,6 @@ def _save_checkpoint(
         if rank == 0:
             torch.save(metadata, path / _METADATA_FILENAME)
 
-
 def _load_checkpoint(
     path: Path,
     state: dict[str, Union[Module, Optimizer, Any]],
@@ -414,12 +392,7 @@ def _load_checkpoint(
     optimizer_states_from_list: bool = False,
     weights_only: Optional[bool] = None,
 ) -> dict[str, Any]:
-    from torch.distributed.checkpoint.state_dict import (
-        StateDictOptions,
-        get_model_state_dict,
-        get_optimizer_state_dict,
-        set_optimizer_state_dict,
-    )
+    from torch.distributed.checkpoint.state_dict import StateDictOptions, get_model_state_dict, get_optimizer_state_dict, set_optimizer_state_dict
 
     modules = {key: module for key, module in state.items() if _has_dtensor_modules(module)}
     if len(modules) == 0:
@@ -501,7 +474,6 @@ def _load_checkpoint(
         " directory with distributed checkpoint shards, or a single file with a full checkpoint."
     )
 
-
 def _setup_device_mesh(
     data_parallel_size: int,
     tensor_parallel_size: int,
@@ -522,12 +494,10 @@ def _setup_device_mesh(
         mesh_dim_names=("data_parallel", "tensor_parallel"),
     )
 
-
 def _has_dtensor_modules(module: object) -> TypeGuard[Module]:
     from torch.distributed._tensor import DTensor
 
     return isinstance(module, Module) and any(isinstance(t, DTensor) for t in module.parameters())
-
 
 def _load_raw_module_state_from_path(path: Path, module: Module, world_size: int, strict: bool = True) -> None:
     """Loads the state dict from a file path into the FSDP module."""
@@ -539,7 +509,6 @@ def _load_raw_module_state_from_path(path: Path, module: Module, world_size: int
     # Use `lazy_load`/`mmap` instead to avoid storing a copy of the full checkpoint per rank
     state_dict = torch.load(path, mmap=True, map_location="cpu") if _TORCH_GREATER_EQUAL_2_3 else _lazy_load(path)
     _load_raw_module_state(state_dict=state_dict, module=module, world_size=world_size, strict=strict)
-
 
 def _load_raw_module_state(
     state_dict: dict[str, Any], module: Module, world_size: int = 1, strict: bool = True
@@ -576,7 +545,6 @@ def _load_raw_module_state(
     else:
         module.load_state_dict(state_dict, strict=strict)
 
-
 def _named_parameters_and_buffers_to_load(module: Module) -> Generator:
     """Returns parameters and buffers, with non-persistent buffers excluded."""
     for param_name, param in itertools.chain(
@@ -586,7 +554,6 @@ def _named_parameters_and_buffers_to_load(module: Module) -> Generator:
         if param_name in module._non_persistent_buffers_set:
             continue
         yield param_name, param
-
 
 def _rekey_optimizer_state_if_needed(optimizer_state_dict: dict[str, Any], module: Module) -> dict[str, Any]:
     """Handles the case where the optimizer state is saved from a normal optimizer and converts the keys to parameter

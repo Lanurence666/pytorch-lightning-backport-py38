@@ -21,11 +21,7 @@ from typing_extensions import override
 from lightning.fabric.accelerators.xla import _XLA_AVAILABLE
 from lightning.fabric.strategies.launchers.xla import _rank_teardown
 from lightning.fabric.utilities import move_data_to_device
-from lightning.pytorch.strategies.launchers.multiprocessing import (
-    _GlobalStateSnapshot,
-    _MultiProcessingLauncher,
-    _WorkerOutput,
-)
+from lightning.pytorch.strategies.launchers.multiprocessing import _GlobalStateSnapshot, _MultiProcessingLauncher, _WorkerOutput
 from lightning.pytorch.trainer.states import TrainerFn
 from lightning.pytorch.utilities.rank_zero import rank_zero_debug
 

@@ -11,11 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import annotations
 import logging
 from abc import ABC, abstractmethod
-from collections.abc import Generator, Mapping
+
 from contextlib import contextmanager
-from typing import Any, Callable, Optional, TypeVar, Union
+from typing import Any, Callable, Optional, TypeVar, Union, Generator, Mapping
 
 import torch
 from torch import Tensor
@@ -42,7 +43,6 @@ TBroadcast = TypeVar("TBroadcast")
 TReduce = TypeVar("TReduce")
 
 log = logging.getLogger(__name__)
-
 
 class Strategy(ABC):
     """Base class for all strategies that change the behaviour of the training, validation and test- loop."""
@@ -597,7 +597,6 @@ class Strategy(ABC):
     def __setstate__(self, state: dict) -> None:
         self.__dict__ = state
         self.optimizers = self.optimizers  # re-create the `_lightning_optimizers`
-
 
 class _ForwardRedirection:
     """Implements the `forward-redirection`.

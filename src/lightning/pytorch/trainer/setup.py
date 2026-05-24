@@ -20,14 +20,7 @@ import lightning.pytorch as pl
 from lightning.fabric.utilities.warnings import PossibleUserWarning
 from lightning.pytorch.accelerators import CUDAAccelerator, MPSAccelerator, XLAAccelerator
 from lightning.pytorch.loggers.logger import DummyLogger
-from lightning.pytorch.profilers import (
-    AdvancedProfiler,
-    PassThroughProfiler,
-    Profiler,
-    PyTorchProfiler,
-    SimpleProfiler,
-    XLAProfiler,
-)
+from lightning.pytorch.profilers import AdvancedProfiler, PassThroughProfiler, Profiler, PyTorchProfiler, SimpleProfiler, XLAProfiler
 from lightning.pytorch.utilities.exceptions import MisconfigurationException
 from lightning.pytorch.utilities.rank_zero import rank_zero_info, rank_zero_warn
 

@@ -1,3 +1,4 @@
+from __future__ import annotations
 # Copyright The Lightning AI team.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,16 +18,15 @@ import copy
 import inspect
 import pickle
 import types
-from collections.abc import MutableMapping, Sequence
+
 from dataclasses import fields, is_dataclass
-from typing import Any, Literal, Optional, Union
+from typing import Any, Literal, Optional, Union, MutableMapping, Sequence
 
 from torch import nn
 
 import lightning.pytorch as pl
 from lightning.fabric.utilities.data import AttributeDict as _AttributeDict
 from lightning.pytorch.utilities.rank_zero import rank_zero_warn
-
 
 def is_picklable(obj: object) -> bool:
     """Tests if an object can be pickled."""
@@ -35,7 +35,6 @@ def is_picklable(obj: object) -> bool:
         return True
     except (pickle.PickleError, AttributeError, RuntimeError, TypeError):
         return False
-
 
 def clean_namespace(hparams: MutableMapping) -> None:
     """Removes all unpicklable entries from hparams."""
@@ -47,7 +46,6 @@ def clean_namespace(hparams: MutableMapping) -> None:
             f" setting `self.save_hyperparameters(ignore=['{k}'])`.",
         )
         del hparams[k]
-
 
 def parse_class_init_keys(cls: type) -> tuple[str, Optional[str], Optional[str]]:
     """Parse key words for standard ``self``, ``*args`` and ``**kwargs``.
@@ -82,12 +80,10 @@ def parse_class_init_keys(cls: type) -> tuple[str, Optional[str], Optional[str]]
 
     return n_self, n_args, n_kwargs
 
-
 def get_init_args(frame: types.FrameType) -> dict[str, Any]:  # pragma: no-cover
     """For backwards compatibility: #16369."""
     _, local_args = _get_init_args(frame)
     return local_args
-
 
 def _get_init_args(frame: types.FrameType) -> tuple[Optional[Any], dict[str, Any]]:
     _, _, _, local_vars = inspect.getargvalues(frame)
@@ -106,7 +102,6 @@ def _get_init_args(frame: types.FrameType) -> tuple[Optional[Any], dict[str, Any
     local_args = {k: v for k, v in local_args.items() if k not in exclude_argnames}
     self_arg = local_vars.get(self_var, None)
     return self_arg, local_args
-
 
 def collect_init_args(
     frame: types.FrameType,
@@ -141,7 +136,6 @@ def collect_init_args(
     if not inside:
         return collect_init_args(frame.f_back, path_args, inside=False, classes=classes)
     return path_args
-
 
 def save_hyperparameters(
     obj: Any,
@@ -218,7 +212,6 @@ def save_hyperparameters(
     # make a deep copy so there are no other runtime changes reflected
     obj._hparams_initial = copy.deepcopy(obj._hparams)
 
-
 class AttributeDict(_AttributeDict):
     """Extended dictionary accessible with dot notation.
 
@@ -235,7 +228,6 @@ class AttributeDict(_AttributeDict):
     "new_key": 42
 
     """
-
 
 def _lightning_get_all_attr_holders(model: "pl.LightningModule", attribute: str) -> list[Any]:
     """Special attribute finding for Lightning.
@@ -265,7 +257,6 @@ def _lightning_get_all_attr_holders(model: "pl.LightningModule", attribute: str)
 
     return holders
 
-
 def _lightning_get_first_attr_holder(model: "pl.LightningModule", attribute: str) -> Optional[Any]:
     """Special attribute finding for Lightning.
 
@@ -279,7 +270,6 @@ def _lightning_get_first_attr_holder(model: "pl.LightningModule", attribute: str
     # using the last holder to preserve backwards compatibility
     return holders[-1]
 
-
 def lightning_hasattr(model: "pl.LightningModule", attribute: str) -> bool:
     """Special hasattr for Lightning.
 
@@ -287,7 +277,6 @@ def lightning_hasattr(model: "pl.LightningModule", attribute: str) -> bool:
 
     """
     return _lightning_get_first_attr_holder(model, attribute) is not None
-
 
 def lightning_getattr(model: "pl.LightningModule", attribute: str) -> Optional[Any]:
     """Special getattr for Lightning. Checks for attribute in model namespace, the old hparams namespace/dict, and the
@@ -309,7 +298,6 @@ def lightning_getattr(model: "pl.LightningModule", attribute: str) -> Optional[A
     if isinstance(holder, dict):
         return holder[attribute]
     return getattr(holder, attribute)
-
 
 def lightning_setattr(model: "pl.LightningModule", attribute: str, value: Any) -> None:
     """Special setattr for Lightning. Checks for attribute in model namespace and the old hparams namespace/dict. Will

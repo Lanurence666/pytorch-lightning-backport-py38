@@ -11,11 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import annotations
 import io
 from contextlib import AbstractContextManager, ExitStack, nullcontext
 from functools import partial
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Callable, Literal, Optional, Union
+from typing import TYPE_CHECKING, Any, Callable, Literal, Optional, Union, Type, Set
 
 import torch
 from torch import Tensor
@@ -32,12 +33,7 @@ from lightning.fabric.plugins.io.xla import XLACheckpointIO
 from lightning.fabric.strategies import ParallelStrategy, _StrategyRegistry
 from lightning.fabric.strategies.fsdp import _apply_filter
 from lightning.fabric.strategies.launchers.xla import _XLALauncher
-from lightning.fabric.strategies.strategy import (
-    TBroadcast,
-    _BackwardSyncControl,
-    _Sharded,
-    _validate_keys_for_strict_loading,
-)
+from lightning.fabric.strategies.strategy import TBroadcast, _BackwardSyncControl, _Sharded, _validate_keys_for_strict_loading
 from lightning.fabric.utilities.cloud_io import get_filesystem
 from lightning.fabric.utilities.init import _EmptyInit
 from lightning.fabric.utilities.rank_zero import rank_zero_only, rank_zero_warn
@@ -47,7 +43,7 @@ if TYPE_CHECKING:
     from torch.optim.lr_scheduler import _LRScheduler
     from torch_xla.distributed.parallel_loader import MpDeviceLoader
 
-_POLICY_SET = set[type[Module]]
+_POLICY_SET = Set[Type[Module]]
 _POLICY = Union[_POLICY_SET, Callable[[Module, bool, int], bool]]
 
 

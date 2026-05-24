@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import annotations
 import logging
 import os
 from typing import Any, Callable, Optional
@@ -18,8 +19,7 @@ from typing import Any, Callable, Optional
 from typing_extensions import override
 
 from lightning.fabric.plugins.io.checkpoint_io import CheckpointIO
-from lightning.fabric.utilities.cloud_io import _atomic_save, get_filesystem
-from lightning.fabric.utilities.cloud_io import _load as pl_load
+from lightning.fabric.utilities.cloud_io import _atomic_save, get_filesystem, _load as pl_load
 from lightning.fabric.utilities.types import _PATH
 
 log = logging.getLogger(__name__)

@@ -9,9 +9,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from collections.abc import Generator
+from __future__ import annotations
+
 from contextlib import contextmanager
-from typing import Any, Callable, Literal, Optional, Union, cast
+from typing import Any, Callable, Literal, Optional, Union, cast, Generator
 
 import torch
 from torch import Tensor
@@ -25,7 +26,6 @@ from lightning.fabric.utilities.types import Optimizable
 from lightning.pytorch.plugins.precision.precision import Precision
 from lightning.pytorch.utilities import GradClipAlgorithmType
 from lightning.pytorch.utilities.exceptions import MisconfigurationException
-
 
 class _AutocastClearCacheOnExit:
     """Proxy a grad-disabling context manager and clear the autocast cache when it exits."""
@@ -45,7 +45,6 @@ class _AutocastClearCacheOnExit:
 
     def __call__(self, func: Callable[..., Any]) -> Callable[..., Any]:
         return self._context_manager(func)
-
 
 class MixedPrecision(Precision):
     """Plugin for Automatic Mixed Precision (AMP) training with ``torch.autocast``.

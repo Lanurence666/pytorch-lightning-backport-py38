@@ -11,10 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import annotations
 import inspect
-from collections.abc import Generator
+
 from contextlib import AbstractContextManager, contextmanager
-from typing import Any, Callable, Optional
+from typing import Any, Callable, Optional, Generator
 
 import torch
 import torch.distributed as dist
@@ -35,7 +36,6 @@ from lightning.pytorch.trainer.states import RunningStage
 from lightning.pytorch.utilities.rank_zero import rank_zero_warn
 from lightning.pytorch.utilities.signature_utils import is_param_in_hook_signature
 
-
 def check_finite_loss(loss: Optional[Tensor]) -> None:
     """Checks for finite loss value.
 
@@ -45,7 +45,6 @@ def check_finite_loss(loss: Optional[Tensor]) -> None:
     """
     if loss is not None and not torch.isfinite(loss).all():
         raise ValueError(f"The loss returned in `training_step` is {loss}.")
-
 
 def _parse_loop_limits(
     min_steps: Optional[int],
@@ -89,7 +88,6 @@ def _parse_loop_limits(
 
     return min_epochs, max_epochs
 
-
 @contextmanager
 def _block_parallel_sync_behavior(strategy: Strategy, block: bool = True) -> Generator[None, None, None]:
     """Blocks synchronization in :class:`~lightning.pytorch.strategies.parallel.ParallelStrategy`. This is useful for
@@ -109,7 +107,6 @@ def _block_parallel_sync_behavior(strategy: Strategy, block: bool = True) -> Gen
     else:
         yield None
 
-
 def _is_max_limit_reached(current: int, maximum: int = -1) -> bool:
     """Check if the limit has been reached (if enabled).
 
@@ -123,14 +120,12 @@ def _is_max_limit_reached(current: int, maximum: int = -1) -> bool:
     """
     return maximum != -1 and current >= maximum
 
-
 def _reset_progress(loop: _Loop) -> None:
     for v in vars(loop).values():
         if isinstance(v, _BaseProgress):
             v.reset()
         elif isinstance(v, _Loop):
             _reset_progress(v)
-
 
 def _select_data_fetcher(trainer: "pl.Trainer", stage: RunningStage) -> _DataFetcher:
     lightning_module = trainer.lightning_module
@@ -152,7 +147,6 @@ def _select_data_fetcher(trainer: "pl.Trainer", stage: RunningStage) -> _DataFet
         )
         return _DataLoaderIterDataFetcher()
     return _PrefetchDataFetcher()
-
 
 def _no_grad_context(loop_run: Callable) -> Callable:
     def _decorator(self: _Loop, *args: Any, **kwargs: Any) -> Any:
@@ -179,7 +173,6 @@ def _no_grad_context(loop_run: Callable) -> Callable:
             return loop_run(self, *args, **kwargs)
 
     return _decorator
-
 
 def _verify_dataloader_idx_requirement(
     hooks: tuple[str, ...], is_expected: bool, stage: RunningStage, pl_module: "pl.LightningModule"
